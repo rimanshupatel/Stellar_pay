@@ -12,11 +12,14 @@
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {
+    "@stellar/stellar-sdk": "^14.4.3",
+    "bcryptjs": "^3.0.3",
     "body-parser": "^2.2.2",
     "cors": "^2.8.6",
     "dotenv": "^17.2.3",
     "express": "^5.2.1",
     "firebase-admin": "^13.6.0",
+    "jsonwebtoken": "^9.0.3",
     "mongodb": "^6.21.0"
   }
 }

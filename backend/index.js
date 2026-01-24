@@ -2,7 +2,8 @@ const express = require('express');
 const cors = require('cors');
 const { MongoClient } = require('mongodb');
 const dotenv = require('dotenv');
-
+const jwt = require('jsonwebtoken');
+const bcrypt = require('bcryptjs');
 dotenv.config();
 
 const app = express();
@@ -11,7 +12,7 @@ app.use(express.json());
 
 // MongoDB connection
 let db;
-const MONGODB_URI =  'mongodb+srv://rimanshupatel3_db_user:Rishii62@cluster0.feb7kvl.mongodb.net/stellarPay';
+const MONGODB_URI = 'mongodb+srv://rimanshupatel3_db_user:Rishii62@cluster0.feb7kvl.mongodb.net/stellarPay';
 
 async function connectDB() {
   try {
@@ -32,7 +33,7 @@ connectDB();
 app.post('/api/create-payment', async (req, res) => {
   try {
     const { merchantAddress, amount, currency } = req.body;
-    
+
     if (!merchantAddress || !amount || !currency) {
       return res.status(400).json({ error: 'Missing required fields' });
     }
@@ -65,12 +66,67 @@ app.post('/api/create-payment', async (req, res) => {
     res.status(500).json({ error: 'Failed to create payment' });
   }
 });
+app.get('/api/auth/me', async (req, res) => {
+  try {
+    const token = req.headers.authorization.split(' ')[1];
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const user = await db.collection('users').findOne({ email: decoded.email });
+    return res.status(200).json({ success: true, user });
+  } catch (error) {
+    console.error('Me error:', error);
+    res.status(500).json({ error: 'Failed to get user' });
+  }
+});
 
+
+app.post('/api/auth/register', async (req, res) => {
+  try {
+    const { email, password, name, role } = req.body;
+    if (!email || !password || !name || !role) {
+      return res.status(400).json({ error: 'Missing required fields' });
+    }
+    const user = await db.collection('users').findOne({ email });
+    if (user) {
+      return res.status(400).json({ error: 'User already exists' });
+    }
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const newUser = { email, password: hashedPassword, name, role };
+    await db.collection('users').insertOne(newUser);
+    const token = jwt.sign({ email }, process.env.JWT_SECRET, { expiresIn: '1h' });
+    return res.status(200).json({ success: true, message: 'User registered successfully', token });
+
+  } catch (error) {
+    console.error('Register error:', error);
+    res.status(500).json({ error: 'Failed to register' });
+  }
+});
+
+app.post('/api/auth/login', async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    if (!email || !password) {
+      return res.status(400).json({ error: 'Missing required fields' });
+    }
+    const user = await db.collection('users').findOne({ email });
+    if (!user) {
+      return res.status(400).json({ error: 'User not found' });
+    }
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+    if (!isPasswordValid) {
+      return res.status(400).json({ error: 'Invalid password' });
+    }
+    const token = jwt.sign({ email: user.email }, process.env.JWT_SECRET, { expiresIn: '1h' });
+    return res.status(200).json({ success: true, message: 'Login successful', token });
+  } catch (error) {
+    console.error('Login error:', error);
+    return res.status(500).json({ error: 'Failed to login' });
+  }
+});
 // 2. Release Funds (Merchant)
 app.post('/api/release-order', async (req, res) => {
   try {
     const { refId } = req.body;
-    
+
     if (!refId) {
       return res.status(400).json({ error: 'Missing refId' });
     }
@@ -113,7 +169,7 @@ app.post('/api/transactions', async (req, res) => {
 
     if (db) {
       await db.collection('transactions').insertOne(transaction);
-      
+
       // Update order status if refId exists
       if (refId) {
         await db.collection('orders').updateOne(

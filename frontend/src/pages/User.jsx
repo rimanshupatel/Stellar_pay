@@ -13,6 +13,7 @@ import { Badge } from '../components/ui/Badge';
 import { Loader } from '../components/ui/Loader';
 import { STELLAR_CONFIG } from '../stellarConfig';
 import { formatCurrency, formatCrypto, formatAddress, formatDate } from '../lib/utils';
+import { useSound } from '../hooks/useSound';
 import axios from 'axios';
 
 const NETWORK_PASSPHRASE = "Test SDF Network ; September 2015";
@@ -45,6 +46,7 @@ export default function User({ walletAddress }) {
     const [balance, setBalance] = useState({ xlm: '0', usdc: '0' });
     const [transactions, setTransactions] = useState([]);
     const [activeTab, setActiveTab] = useState('pay');
+    const { playSuccess } = useSound();
     const isBusy = BUSY_STATUSES.includes(status);
 
     useEffect(() => {
@@ -196,6 +198,7 @@ export default function User({ walletAddress }) {
             }
 
             setStatus("Payment Successful!");
+            playSuccess();
             setTimeout(() => {
                 setScanResult(null);
                 setStatus("");
