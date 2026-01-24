@@ -1,49 +1,72 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { isConnected, isAllowed, setAllowed, getAddress } from '@stellar/freighter-api';
+import { Button } from './ui/Button';
+import { Badge } from './ui/Badge';
+import { Wallet, CheckCircle, XCircle } from 'lucide-react';
+import { formatAddress } from '../lib/utils';
 
-const ConnectWallet = ({ onConnect, address }) => {
-    const [hasAPI, setHasAPI] = useState(false);
+export default function ConnectWallet({ onConnect, address }) {
+  const [hasAPI, setHasAPI] = useState(false);
+  const [loading, setLoading] = useState(false);
 
-    useEffect(() => {
-        // Check if Freighter is installed
-        const checkFreighter = async () => {
-            if (await isConnected()) {
-                setHasAPI(true);
-                if (await isAllowed()) {
-                    const { address } = await getAddress();
-                    if (address) onConnect(address);
-                }
-            }
-        };
-        checkFreighter();
-    }, []);
-
-    const handleConnect = async () => {
-        if (!hasAPI) {
-            alert("Freighter wallet not installed!");
-            return;
-        }
-
-        try {
-            await setAllowed();
+  useEffect(() => {
+    const checkFreighter = async () => {
+      try {
+        if (await isConnected()) {
+          setHasAPI(true);
+          if (await isAllowed()) {
             const { address } = await getAddress();
             if (address) onConnect(address);
-        } catch (e) {
-            console.error("Connection failed", e);
+          }
         }
+      } catch (e) {
+        console.error('Freighter check failed', e);
+      }
     };
+    checkFreighter();
+  }, [onConnect]);
 
+  const handleConnect = async () => {
+    if (!hasAPI) {
+      alert('Please install Freighter wallet extension first!\n\nVisit: https://freighter.app');
+      return;
+    }
+
+    setLoading(true);
+    try {
+      await setAllowed();
+      const { address } = await getAddress();
+      if (address) {
+        onConnect(address);
+      }
+    } catch (e) {
+      console.error('Connection failed', e);
+      alert('Failed to connect wallet. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (address) {
     return (
-        <div>
-            {address ? (
-                <button disabled style={{ background: '#4CAF50', color: 'white' }}>
-                    {address.substring(0, 4)}...{address.substring(address.length - 4)}
-                </button>
-            ) : (
-                <button onClick={handleConnect}>Connect Wallet</button>
-            )}
-        </div>
+      <div className="flex items-center space-x-2">
+        <Badge variant="success" className="flex items-center space-x-2">
+          <CheckCircle className="w-3 h-3" />
+          <span className="font-mono text-xs">{formatAddress(address)}</span>
+        </Badge>
+      </div>
     );
-};
+  }
 
-export default ConnectWallet;
+  return (
+    <Button
+      onClick={handleConnect}
+      disabled={loading}
+      size="sm"
+      className="flex items-center space-x-2"
+    >
+      <Wallet className="w-4 h-4" />
+      <span>{loading ? 'Connecting...' : 'Connect Wallet'}</span>
+    </Button>
+  );
+}
