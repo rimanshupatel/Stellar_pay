@@ -98,15 +98,15 @@ export default function Landing() {
               transition={{ duration: 0.6, delay: 0.6 }}
               className="flex flex-col sm:flex-row gap-4 justify-center items-center"
             >
-              <Link to="/user">
+              <Link to="/auth">
                 <Button size="lg" className="group flex items-center space-x-2 bg-gradient-to-r from-[#FF9B71] to-[#FF7E5F] hover:from-[#FF8A5C] hover:to-[#FF6D4A] text-white shadow-lg hover:shadow-xl px-8 py-4 text-base">
-                  <span>Pay with Crypto</span>
+                  <span>Get Started</span>
                   <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                 </Button>
               </Link>
-              <Link to="/merchant">
+              <Link to="/auth">
                 <Button variant="outline" size="lg" className="px-8 py-4 text-base border-2 border-gray-300 hover:border-gray-900 hover:bg-gray-50">
-                  Merchant Dashboard
+                  Sign In
                 </Button>
               </Link>
             </motion.div>
@@ -241,14 +241,14 @@ export default function Landing() {
               Join the future of payments. Fast, secure, and borderless.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link to="/user">
+              <Link to="/auth">
                 <Button variant="secondary" size="lg" className="bg-white text-gray-900 hover:bg-gray-50">
-                  Start Paying
+                  Get Started
                 </Button>
               </Link>
-              <Link to="/merchant">
+              <Link to="/auth">
                 <Button variant="outline" size="lg" className="bg-white/10 border-white/30 text-white hover:bg-white/20">
-                  Become a Merchant
+                  Sign In
                 </Button>
               </Link>
             </div>
@@ -256,7 +256,7 @@ export default function Landing() {
         </div>
       </section>
 
-      <Footer />
+
     </div>
   );
 }

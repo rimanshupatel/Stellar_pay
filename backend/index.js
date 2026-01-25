@@ -85,15 +85,24 @@ app.post('/api/auth/register', async (req, res) => {
     if (!email || !password || !name || !role) {
       return res.status(400).json({ error: 'Missing required fields' });
     }
-    const user = await db.collection('users').findOne({ email });
-    if (user) {
+    const existingUser = await db.collection('users').findOne({ email });
+    if (existingUser) {
       return res.status(400).json({ error: 'User already exists' });
     }
     const hashedPassword = await bcrypt.hash(password, 10);
     const newUser = { email, password: hashedPassword, name, role };
     await db.collection('users').insertOne(newUser);
     const token = jwt.sign({ email }, process.env.JWT_SECRET, { expiresIn: '1h' });
-    return res.status(200).json({ success: true, message: 'User registered successfully', token });
+
+    // Return user object without password
+    const userWithoutPassword = { email, name, role };
+
+    return res.status(200).json({
+      success: true,
+      message: 'User registered successfully',
+      token,
+      user: userWithoutPassword
+    });
 
   } catch (error) {
     console.error('Register error:', error);
@@ -116,7 +125,16 @@ app.post('/api/auth/login', async (req, res) => {
       return res.status(400).json({ error: 'Invalid password' });
     }
     const token = jwt.sign({ email: user.email }, process.env.JWT_SECRET, { expiresIn: '1h' });
-    return res.status(200).json({ success: true, message: 'Login successful', token });
+
+    // Remove password from user object before sending
+    const { password: _, ...userWithoutPassword } = user;
+
+    return res.status(200).json({
+      success: true,
+      message: 'Login successful',
+      token,
+      user: userWithoutPassword
+    });
   } catch (error) {
     console.error('Login error:', error);
     return res.status(500).json({ error: 'Failed to login' });

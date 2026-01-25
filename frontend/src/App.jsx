@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Landing from './pages/Landing';
 import User from './pages/User';
@@ -15,6 +15,17 @@ function App() {
   const [walletAddress, setWalletAddress] = useState(null);
   const { user, loading } = useAuth();
 
+  // Clear wallet address when user logs out
+  useEffect(() => {
+    if (!user) {
+      setWalletAddress(null);
+    }
+  }, [user]);
+
+  const clearWallet = () => {
+    setWalletAddress(null);
+  };
+
   return (
     <>
       <Toaster position="top-right" />
@@ -25,24 +36,48 @@ function App() {
       ) : (
         <Router>
           <div className="min-h-screen bg-[#FAFAFA]">
-            <Navbar walletAddress={walletAddress} onConnect={setWalletAddress} />
+            <Navbar
+              walletAddress={walletAddress}
+              onConnect={setWalletAddress}
+              onClearWallet={clearWallet}
+            />
             <Routes>
-              {user ? (
-                user.role === "user" ? (
-                  <Route path="/" element={<User walletAddress={walletAddress} onConnect={setWalletAddress} />} />
-                ) : user.role === "merchant" ? (
-                  <Route path="/" element={<Merchant walletAddress={walletAddress} onConnect={setWalletAddress} />} />
-                ) : (
-                  <Route path="/" element={<Landing />} />
-                )
-              ) : (
-                <Route path="/" element={<AuthPage />} />
-              )}
-              <Route path="/user" element={<User walletAddress={walletAddress} onConnect={setWalletAddress} />} />
-              <Route path="/merchant" element={<Merchant walletAddress={walletAddress} onConnect={setWalletAddress} />} />
-            
+              {/* Public Routes */}
+              <Route path="/" element={<Landing />} />
+              <Route
+                path="/auth"
+                element={
+                  user ? (
+                    <Navigate to={user?.role === "user" ? "/user" : user?.role === "merchant" ? "/merchant" : "/"} replace />
+                  ) : (
+                    <AuthPage />
+                  )
+                }
+              />
+
+              {/* Protected Routes */}
+              <Route
+                path="/user"
+                element={
+                  user?.role === "user" ? (
+                    <User walletAddress={walletAddress} onConnect={setWalletAddress} />
+                  ) : (
+                    <Navigate to="/auth" replace />
+                  )
+                }
+              />
+              <Route
+                path="/merchant"
+                element={
+                  user?.role === "merchant" ? (
+                    <Merchant walletAddress={walletAddress} onConnect={setWalletAddress} />
+                  ) : (
+                    <Navigate to="/auth" replace />
+                  )
+                }
+              />
             </Routes>
-<Footer/>
+            <Footer />
           </div>
         </Router>
       )}

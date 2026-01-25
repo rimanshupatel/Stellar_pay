@@ -8,13 +8,20 @@ import { useAuth } from '../lib/useAuth';
 import { formatAddress } from '../lib/utils';
 import { toastConfig } from './ui/Toast';
 
-export default function Navbar({ walletAddress, onConnect }) {
+export default function Navbar({ walletAddress, onConnect, onClearWallet }) {
   const location = useLocation();
   const { user, logout } = useAuth();
   const [scrolled, setScrolled] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [copied, setCopied] = useState(false);
   const [showMobileMenu, setShowMobileMenu] = useState(false);
+
+  const handleLogout = () => {
+    if (onClearWallet) {
+      onClearWallet();
+    }
+    logout();
+  };
 
   useEffect(() => {
     const handleScroll = () => {
@@ -53,8 +60,8 @@ export default function Navbar({ walletAddress, onConnect }) {
         initial={{ y: -20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled
-            ? 'bg-white/95 backdrop-blur-xl shadow-sm border-b border-gray-200/60'
-            : 'bg-transparent'
+          ? 'bg-white/95 backdrop-blur-xl shadow-sm border-b border-gray-200/60'
+          : 'bg-transparent'
           }`}
       >
         <div className="container mx-auto max-w-7xl px-4">
@@ -75,8 +82,8 @@ export default function Navbar({ walletAddress, onConnect }) {
                 <Link
                   to="/"
                   className={`relative px-5 py-2 rounded-full text-sm font-medium transition-all duration-200 ${isActive('/')
-                      ? 'bg-white text-gray-900 shadow-sm'
-                      : 'text-gray-600 hover:text-gray-900'
+                    ? 'bg-white text-gray-900 shadow-sm'
+                    : 'text-gray-600 hover:text-gray-900'
                     }`}
                 >
                   {isActive('/') && (
@@ -88,11 +95,11 @@ export default function Navbar({ walletAddress, onConnect }) {
                   )}
                   <span className="relative z-10">Home</span>
                 </Link>
-                {user && user.role=="user" && <Link
+                {user?.role === "user" && <Link
                   to="/user"
                   className={`relative px-5 py-2 rounded-full text-sm font-medium transition-all duration-200 ${isActive('/user')
-                      ? 'bg-white text-gray-900 shadow-sm'
-                      : 'text-gray-600 hover:text-gray-900'
+                    ? 'bg-white text-gray-900 shadow-sm'
+                    : 'text-gray-600 hover:text-gray-900'
                     }`}
                 >
                   {isActive('/user') && (
@@ -104,11 +111,11 @@ export default function Navbar({ walletAddress, onConnect }) {
                   )}
                   <span className="relative z-10">Pay</span>
                 </Link>}
-                {user && user.role=="merchant" && <Link
+                {user?.role === "merchant" && <Link
                   to="/merchant"
                   className={`relative px-5 py-2 rounded-full text-sm font-medium transition-all duration-200 ${isActive('/merchant')
-                      ? 'bg-white text-gray-900 shadow-sm'
-                      : 'text-gray-600 hover:text-gray-900'
+                    ? 'bg-white text-gray-900 shadow-sm'
+                    : 'text-gray-600 hover:text-gray-900'
                     }`}
                 >
                   {isActive('/merchant') && (
@@ -180,7 +187,7 @@ export default function Navbar({ walletAddress, onConnect }) {
                         )}
                         <button
                           onClick={() => {
-                            logout();
+                            handleLogout();
                             setShowUserMenu(false);
                           }}
                           className="w-full flex items-center space-x-2 px-4 py-3 text-sm font-medium text-red-600 hover:bg-red-50 transition-colors"
@@ -282,7 +289,7 @@ export default function Navbar({ walletAddress, onConnect }) {
                   </div>
                   <Button
                     onClick={() => {
-                      logout();
+                      handleLogout();
                       setShowMobileMenu(false);
                     }}
                     variant="outline"

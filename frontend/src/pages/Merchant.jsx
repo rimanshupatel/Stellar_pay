@@ -14,7 +14,7 @@ import { formatCurrency, formatCrypto, formatDate } from '../lib/utils';
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 import axios from 'axios';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
+const API_URL = import.meta.env.VITE_API_URL || 'https://aditya.dev-nest.tech/api';
 
 export default function Merchant({ walletAddress, onConnect }) {
   const [amount, setAmount] = useState('');
@@ -233,31 +233,28 @@ export default function Merchant({ walletAddress, onConnect }) {
       <div className="flex space-x-1 mb-8 bg-gray-100/80 rounded-full p-1.5 w-fit border border-gray-200/60">
         <button
           onClick={() => setActiveTab('dashboard')}
-          className={`px-6 py-2.5 rounded-full text-sm font-medium transition-all duration-200 ${
-            activeTab === 'dashboard'
+          className={`px-6 py-2.5 rounded-full text-sm font-medium transition-all duration-200 ${activeTab === 'dashboard'
               ? 'bg-white text-gray-900 shadow-sm'
               : 'text-gray-600 hover:text-gray-900'
-          }`}
+            }`}
         >
           Dashboard
         </button>
         <button
           onClick={() => setActiveTab('qr')}
-          className={`px-6 py-2.5 rounded-full text-sm font-medium transition-all duration-200 ${
-            activeTab === 'qr'
+          className={`px-6 py-2.5 rounded-full text-sm font-medium transition-all duration-200 ${activeTab === 'qr'
               ? 'bg-white text-gray-900 shadow-sm'
               : 'text-gray-600 hover:text-gray-900'
-          }`}
+            }`}
         >
           Generate QR
         </button>
         <button
           onClick={() => setActiveTab('history')}
-          className={`px-6 py-2.5 rounded-full text-sm font-medium transition-all duration-200 ${
-            activeTab === 'history'
+          className={`px-6 py-2.5 rounded-full text-sm font-medium transition-all duration-200 ${activeTab === 'history'
               ? 'bg-white text-gray-900 shadow-sm'
               : 'text-gray-600 hover:text-gray-900'
-          }`}
+            }`}
         >
           Transaction History
         </button>

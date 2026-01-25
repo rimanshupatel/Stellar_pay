@@ -10,27 +10,31 @@ export const AuthProvider = ({ children }) => {
 
   // Fetch logged-in user
   const fetchMe = async () => {
-    if (!token) {
+    const storedToken = localStorage.getItem("token");
+    if (!storedToken) {
       setLoading(false);
-      return;
+      return null;
     }
 
     try {
-      const res = await fetch("http://localhost:3000/api/auth/me", {
+      const res = await fetch("https://aditya.dev-nest.tech/api/auth/me", {
         headers: {
-          Authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${storedToken}`,
         },
       });
 
       const data = await res.json();
       if (data.success) {
         setUser(data.user);
+        return data.user;
       } else {
         logout();
+        return null;
       }
     } catch (err) {
       console.error(err);
       logout();
+      return null;
     } finally {
       setLoading(false);
     }
@@ -42,7 +46,7 @@ export const AuthProvider = ({ children }) => {
 
   // LOGIN
   const login = async (email, password) => {
-    const res = await fetch("http://localhost:3000/api/auth/login", {
+    const res = await fetch("https://aditya.dev-nest.tech/api/auth/login", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email, password }),
@@ -52,17 +56,22 @@ export const AuthProvider = ({ children }) => {
     if (!res.ok) throw new Error(data.error);
 
     localStorage.setItem("token", data.token);
-    await fetchMe();
-    if(user.role=="user") {
-      window.location.href = "/user";
-    } else {
-      window.location.href = "/merchant";
+
+    // Fetch user details immediately to get role
+    const fetchedUser = await fetchMe();
+
+    if (fetchedUser) {
+      if (fetchedUser.role === "user") {
+        window.location.href = "/user";
+      } else {
+        window.location.href = "/merchant";
+      }
     }
   };
 
   // REGISTER
   const register = async (name, email, password, role) => {
-    const res = await fetch("http://localhost:3000/api/auth/register", {
+    const res = await fetch("https://aditya.dev-nest.tech/api/auth/register", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ name, email, password, role }),
@@ -72,19 +81,24 @@ export const AuthProvider = ({ children }) => {
     if (!res.ok) throw new Error(data.error);
 
     localStorage.setItem("token", data.token);
-    await fetchMe();
-    if(role=="user") {
-      window.location.href = "/user";
-    } else {
-      window.location.href = "/merchant";
-    }
 
+    // Fetch user details immediately
+    const fetchedUser = await fetchMe();
+
+    if (fetchedUser) {
+      if (fetchedUser.role === "user") {
+        window.location.href = "/user";
+      } else {
+        window.location.href = "/merchant";
+      }
+    }
   };
 
   // LOGOUT
   const logout = () => {
     localStorage.removeItem("token");
     setUser(null);
+    window.location.href = "/";
   };
 
   return (

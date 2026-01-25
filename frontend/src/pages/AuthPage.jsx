@@ -251,8 +251,8 @@ export default function AuthPage() {
                                                             key={r}
                                                             onClick={() => setRole(r)}
                                                             className={`relative flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm font-medium transition-all duration-300 ${role === r
-                                                                    ? "text-gray-900 bg-white shadow-sm"
-                                                                    : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
+                                                                ? "text-gray-900 bg-white shadow-sm"
+                                                                : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
                                                                 }`}
                                                         >
                                                             {role === r && (

@@ -17,7 +17,7 @@ import { formatCurrency, formatCrypto, formatAddress, formatDate } from '../lib/
 import axios from 'axios';
 
 const NETWORK_PASSPHRASE = "Test SDF Network ; September 2015";
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
+const API_URL = import.meta.env.VITE_API_URL || 'https://aditya.dev-nest.tech/api';
 
 function hasTrustline(account, asset) {
     if (asset.isNative()) return true;
@@ -329,8 +329,8 @@ export default function User({ walletAddress, onConnect }) {
                 <button
                     onClick={() => setActiveTab('pay')}
                     className={`px-6 py-2.5 rounded-full text-sm font-medium transition-all duration-200 ${activeTab === 'pay'
-                            ? 'bg-white text-gray-900 shadow-sm'
-                            : 'text-gray-600 hover:text-gray-900'
+                        ? 'bg-white text-gray-900 shadow-sm'
+                        : 'text-gray-600 hover:text-gray-900'
                         }`}
                 >
                     Pay
@@ -338,8 +338,8 @@ export default function User({ walletAddress, onConnect }) {
                 <button
                     onClick={() => setActiveTab('history')}
                     className={`px-6 py-2.5 rounded-full text-sm font-medium transition-all duration-200 ${activeTab === 'history'
-                            ? 'bg-white text-gray-900 shadow-sm'
-                            : 'text-gray-600 hover:text-gray-900'
+                        ? 'bg-white text-gray-900 shadow-sm'
+                        : 'text-gray-600 hover:text-gray-900'
                         }`}
                 >
                     Transaction History
@@ -445,10 +445,10 @@ export default function User({ walletAddress, onConnect }) {
 
                                     {status && (
                                         <div className={`p-4 rounded-xl flex items-center space-x-3 border ${status.includes('Successful')
-                                                ? 'bg-green-50 text-green-800 border-green-200'
-                                                : status.includes('Failed')
-                                                    ? 'bg-red-50 text-red-800 border-red-200'
-                                                    : 'bg-blue-50 text-blue-800 border-blue-200'
+                                            ? 'bg-green-50 text-green-800 border-green-200'
+                                            : status.includes('Failed')
+                                                ? 'bg-red-50 text-red-800 border-red-200'
+                                                : 'bg-blue-50 text-blue-800 border-blue-200'
                                             }`}>
                                             {isBusy ? (
                                                 <Loader size="sm" />
