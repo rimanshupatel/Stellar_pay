@@ -137,11 +137,13 @@ export default function Merchant({ walletAddress }) {
 
   if (!walletAddress) {
     return (
-      <div className="container mx-auto max-w-4xl px-4 py-12">
+      <div className="container mx-auto max-w-4xl px-4 py-24">
         <Card className="text-center">
-          <QrCode className="w-16 h-16 mx-auto mb-4 text-slate-400" />
+          <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center mx-auto mb-6 shadow-lg shadow-blue-500/20">
+            <QrCode className="w-10 h-10 text-white" />
+          </div>
           <CardTitle>Connect Your Wallet</CardTitle>
-          <CardDescription className="mt-2">
+          <CardDescription className="mt-3">
             Connect your merchant wallet to start accepting payments
           </CardDescription>
         </Card>
@@ -150,19 +152,19 @@ export default function Merchant({ walletAddress }) {
   }
 
   return (
-    <div className="container mx-auto max-w-7xl px-4 py-8">
+    <div className="container mx-auto max-w-7xl px-4 py-24">
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-10">
         <Card>
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-slate-600 dark:text-slate-400 mb-1">Total Revenue</p>
-              <p className="text-2xl font-bold text-slate-900 dark:text-white">
+              <p className="text-sm text-gray-600 mb-1.5 font-medium">Total Revenue</p>
+              <p className="text-2xl font-bold text-gray-900">
                 {formatCurrency(stats.totalRevenue)}
               </p>
             </div>
-            <div className="w-12 h-12 rounded-full bg-gradient-to-br from-green-500 to-emerald-500 flex items-center justify-center">
-              <DollarSign className="w-6 h-6 text-white" />
+            <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-green-600 to-emerald-600 flex items-center justify-center shadow-md shadow-green-500/20">
+              <DollarSign className="w-7 h-7 text-white" />
             </div>
           </div>
         </Card>
@@ -170,13 +172,13 @@ export default function Merchant({ walletAddress }) {
         <Card>
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-slate-600 dark:text-slate-400 mb-1">Today's Revenue</p>
-              <p className="text-2xl font-bold text-slate-900 dark:text-white">
+              <p className="text-sm text-gray-600 mb-1.5 font-medium">Today's Revenue</p>
+              <p className="text-2xl font-bold text-gray-900">
                 {formatCurrency(stats.todayRevenue)}
               </p>
             </div>
-            <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center">
-              <TrendingUp className="w-6 h-6 text-white" />
+            <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center shadow-md shadow-blue-500/20">
+              <TrendingUp className="w-7 h-7 text-white" />
             </div>
           </div>
         </Card>
@@ -184,13 +186,13 @@ export default function Merchant({ walletAddress }) {
         <Card>
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-slate-600 dark:text-slate-400 mb-1">Total Transactions</p>
-              <p className="text-2xl font-bold text-slate-900 dark:text-white">
+              <p className="text-sm text-gray-600 mb-1.5 font-medium">Total Transactions</p>
+              <p className="text-2xl font-bold text-gray-900">
                 {stats.totalTransactions}
               </p>
             </div>
-            <div className="w-12 h-12 rounded-full bg-gradient-to-br from-pink-500 to-rose-500 flex items-center justify-center">
-              <BarChartIcon className="w-6 h-6 text-white" />
+            <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-purple-600 to-pink-600 flex items-center justify-center shadow-md shadow-purple-500/20">
+              <BarChartIcon className="w-7 h-7 text-white" />
             </div>
           </div>
         </Card>
@@ -198,44 +200,47 @@ export default function Merchant({ walletAddress }) {
         <Card>
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-slate-600 dark:text-slate-400 mb-1">Pending Orders</p>
-              <p className="text-2xl font-bold text-slate-900 dark:text-white">
+              <p className="text-sm text-gray-600 mb-1.5 font-medium">Pending Orders</p>
+              <p className="text-2xl font-bold text-gray-900">
                 {stats.pendingOrders}
               </p>
             </div>
-            <div className="w-12 h-12 rounded-full bg-gradient-to-br from-yellow-500 to-orange-500 flex items-center justify-center">
-              <Clock className="w-6 h-6 text-white" />
+            <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-yellow-600 to-orange-600 flex items-center justify-center shadow-md shadow-yellow-500/20">
+              <Clock className="w-7 h-7 text-white" />
             </div>
           </div>
         </Card>
       </div>
 
       {/* Tabs */}
-      <div className="flex space-x-2 mb-6 border-b border-slate-200 dark:border-slate-700">
+      <div className="flex space-x-1 mb-8 bg-gray-100/80 rounded-full p-1.5 w-fit border border-gray-200/60">
         <button
           onClick={() => setActiveTab('dashboard')}
-          className={`px-6 py-3 font-medium transition-colors border-b-2 ${activeTab === 'dashboard'
-            ? 'border-blue-600 text-blue-600'
-            : 'border-transparent text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
-            }`}
+          className={`px-6 py-2.5 rounded-full text-sm font-medium transition-all duration-200 ${
+            activeTab === 'dashboard'
+              ? 'bg-white text-gray-900 shadow-sm'
+              : 'text-gray-600 hover:text-gray-900'
+          }`}
         >
           Dashboard
         </button>
         <button
           onClick={() => setActiveTab('qr')}
-          className={`px-6 py-3 font-medium transition-colors border-b-2 ${activeTab === 'qr'
-            ? 'border-blue-600 text-blue-600'
-            : 'border-transparent text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
-            }`}
+          className={`px-6 py-2.5 rounded-full text-sm font-medium transition-all duration-200 ${
+            activeTab === 'qr'
+              ? 'bg-white text-gray-900 shadow-sm'
+              : 'text-gray-600 hover:text-gray-900'
+          }`}
         >
           Generate QR
         </button>
         <button
           onClick={() => setActiveTab('history')}
-          className={`px-6 py-3 font-medium transition-colors border-b-2 ${activeTab === 'history'
-            ? 'border-blue-600 text-blue-600'
-            : 'border-transparent text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
-            }`}
+          className={`px-6 py-2.5 rounded-full text-sm font-medium transition-all duration-200 ${
+            activeTab === 'history'
+              ? 'bg-white text-gray-900 shadow-sm'
+              : 'text-gray-600 hover:text-gray-900'
+          }`}
         >
           Transaction History
         </button>
@@ -260,14 +265,15 @@ export default function Merchant({ walletAddress }) {
                 {chartData.length > 0 ? (
                   <ResponsiveContainer width="100%" height={300}>
                     <LineChart data={chartData}>
-                      <CartesianGrid strokeDasharray="3 3" className="stroke-slate-200 dark:stroke-slate-700" />
-                      <XAxis dataKey="date" className="text-slate-600 dark:text-slate-400" />
-                      <YAxis className="text-slate-600 dark:text-slate-400" />
+                      <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
+                      <XAxis dataKey="date" tick={{ fill: '#6B7280' }} />
+                      <YAxis tick={{ fill: '#6B7280' }} />
                       <Tooltip
                         contentStyle={{
-                          backgroundColor: 'rgba(255, 255, 255, 0.95)',
-                          border: '1px solid #e2e8f0',
-                          borderRadius: '8px'
+                          backgroundColor: '#FFFFFF',
+                          border: '1px solid #E5E7EB',
+                          borderRadius: '12px',
+                          boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
                         }}
                       />
                       <Legend />
@@ -288,7 +294,7 @@ export default function Merchant({ walletAddress }) {
                     </LineChart>
                   </ResponsiveContainer>
                 ) : (
-                  <div className="text-center py-12 text-slate-600 dark:text-slate-400">
+                  <div className="text-center py-16 text-gray-600">
                     No data available yet
                   </div>
                 )}
@@ -303,7 +309,7 @@ export default function Merchant({ walletAddress }) {
               </CardHeader>
               <CardContent>
                 {transactions.slice(0, 5).length === 0 ? (
-                  <div className="text-center py-8 text-slate-600 dark:text-slate-400">
+                  <div className="text-center py-12 text-gray-600">
                     No transactions yet
                   </div>
                 ) : (
@@ -311,21 +317,21 @@ export default function Merchant({ walletAddress }) {
                     {transactions.slice(0, 5).map((tx) => (
                       <div
                         key={tx._id || tx.refId}
-                        className="p-4 glass rounded-lg flex items-center justify-between"
+                        className="p-4 bg-gray-50 rounded-xl border border-gray-200 flex items-center justify-between hover:bg-gray-100/50 transition-colors"
                       >
                         <div className="flex-1">
                           <div className="flex items-center space-x-3 mb-2">
                             <Badge variant={tx.status === 'success' ? 'success' : tx.status === 'failed' ? 'error' : 'warning'}>
                               {tx.status}
                             </Badge>
-                            <span className="text-sm text-slate-600 dark:text-slate-400">
+                            <span className="text-sm text-gray-600">
                               {formatDate(tx.timestamp || tx.createdAt)}
                             </span>
                           </div>
-                          <p className="font-medium text-slate-900 dark:text-white">
+                          <p className="font-semibold text-gray-900 text-lg">
                             {formatCurrency(tx.inrAmount || 0)}
                           </p>
-                          <p className="text-sm text-slate-600 dark:text-slate-400">
+                          <p className="text-sm text-gray-600">
                             {formatCrypto(tx.cryptoAmount, tx.currency)}
                           </p>
                         </div>
@@ -353,7 +359,7 @@ export default function Merchant({ walletAddress }) {
                 </CardHeader>
                 <CardContent className="space-y-6">
                   <div>
-                    <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                    <label className="block text-sm font-medium text-gray-700 mb-2.5">
                       Amount
                     </label>
                     <input
@@ -363,17 +369,17 @@ export default function Merchant({ walletAddress }) {
                       placeholder="100.00"
                       step="0.01"
                       min="0"
-                      className="w-full px-4 py-3 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                    <label className="block text-sm font-medium text-gray-700 mb-2.5">
                       Currency
                     </label>
                     <select
                       value={currency}
                       onChange={(e) => setCurrency(e.target.value)}
-                      className="w-full px-4 py-3 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                     >
                       <option value="USDC">USDC (Testnet)</option>
                       <option value="XLM">XLM</option>
@@ -411,20 +417,20 @@ export default function Merchant({ walletAddress }) {
                       <QRCode value={order.qrData} size={256} />
                     </div>
                     <div className="mt-6 text-center space-y-2">
-                      <p className="text-2xl font-bold text-slate-900 dark:text-white">
+                      <p className="text-2xl font-bold text-gray-900">
                         {formatCrypto(order.amount, order.currency)}
                       </p>
-                      <p className="text-slate-600 dark:text-slate-400">
+                      <p className="text-gray-600">
                         Order ID: {order.refId}
                       </p>
                     </div>
                   </div>
 
-                  <div className="p-4 glass rounded-lg">
-                    <p className="text-sm text-slate-600 dark:text-slate-400 mb-2">
+                  <div className="p-5 bg-gray-50 rounded-xl border border-gray-200">
+                    <p className="text-sm font-medium text-gray-700 mb-3">
                       Instructions
                     </p>
-                    <ol className="list-decimal list-inside space-y-1 text-sm text-slate-700 dark:text-slate-300">
+                    <ol className="list-decimal list-inside space-y-2 text-sm text-gray-700 leading-relaxed">
                       <li>Customer scans this QR code with their wallet</li>
                       <li>They confirm and approve the payment</li>
                       <li>Once payment is confirmed, release the local currency</li>
@@ -532,40 +538,42 @@ export default function Merchant({ walletAddress }) {
               </CardHeader>
               <CardContent>
                 {transactions.length === 0 ? (
-                  <div className="text-center py-12">
-                    <FileText className="w-16 h-16 mx-auto mb-4 text-slate-400" />
-                    <p className="text-slate-600 dark:text-slate-400">No transactions yet</p>
+                  <div className="text-center py-16">
+                    <div className="w-20 h-20 rounded-2xl bg-gray-100 flex items-center justify-center mx-auto mb-4">
+                      <FileText className="w-10 h-10 text-gray-400" />
+                    </div>
+                    <p className="text-gray-600">No transactions yet</p>
                   </div>
                 ) : (
-                  <div className="space-y-4">
+                  <div className="space-y-3">
                     {transactions.map((tx) => (
                       <div
                         key={tx._id || tx.refId}
-                        className="p-4 glass rounded-lg flex items-center justify-between"
+                        className="p-4 bg-gray-50 rounded-xl border border-gray-200 flex items-center justify-between hover:bg-gray-100/50 transition-colors"
                       >
                         <div className="flex-1">
                           <div className="flex items-center space-x-3 mb-2">
                             <Badge variant={tx.status === 'success' ? 'success' : tx.status === 'failed' ? 'error' : 'warning'}>
                               {tx.status}
                             </Badge>
-                            <span className="text-sm text-slate-600 dark:text-slate-400">
+                            <span className="text-sm text-gray-600">
                               {formatDate(tx.timestamp || tx.createdAt)}
                             </span>
                           </div>
-                          <p className="font-medium text-slate-900 dark:text-white text-lg">
+                          <p className="font-semibold text-gray-900 text-lg">
                             {formatCurrency(tx.inrAmount || 0)}
                           </p>
-                          <p className="text-sm text-slate-600 dark:text-slate-400">
+                          <p className="text-sm text-gray-600">
                             {formatCrypto(tx.cryptoAmount, tx.currency)}
                           </p>
                           {tx.txHash && (
-                            <p className="text-xs font-mono text-slate-500 dark:text-slate-400 mt-1">
+                            <p className="text-xs font-mono text-gray-500 mt-1">
                               TX: {tx.txHash.slice(0, 8)}...{tx.txHash.slice(-8)}
                             </p>
                           )}
                         </div>
                         <div className="text-right">
-                          <p className="text-xs text-slate-500 dark:text-slate-400">
+                          <p className="text-xs text-gray-500">
                             Order: {tx.refId}
                           </p>
                         </div>

@@ -15,30 +15,32 @@ function App() {
 
   return (
     <>
-      {loading ? <Loader /> :
-        (
-          <>
-            <Router>
-              <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
-                <Navbar walletAddress={walletAddress} onConnect={setWalletAddress} />
-                <Routes>
-                  {user ? user.role === "user" ?
-                    <Route path="/" element={<User walletAddress={walletAddress} />} />
-                    :
-                    user.role === "merchant" ?
-                      <Route path="/" element={<Merchant walletAddress={walletAddress} />} />
-                      :
-                      <Route path="/" element={<Landing />} />
-                    :
-                    <Route path="/" element={<AuthPage />} />
-
-                  }
-                </Routes>
-              </div>
-            </Router>
-          </>
-        )
-      }
+      {loading ? (
+        <div className="min-h-screen bg-[#FAFAFA] flex items-center justify-center">
+          <Loader />
+        </div>
+      ) : (
+        <Router>
+          <div className="min-h-screen bg-[#FAFAFA]">
+            <Navbar walletAddress={walletAddress} onConnect={setWalletAddress} />
+            <Routes>
+              {user ? (
+                user.role === "user" ? (
+                  <Route path="/" element={<User walletAddress={walletAddress} />} />
+                ) : user.role === "merchant" ? (
+                  <Route path="/" element={<Merchant walletAddress={walletAddress} />} />
+                ) : (
+                  <Route path="/" element={<Landing />} />
+                )
+              ) : (
+                <Route path="/" element={<AuthPage />} />
+              )}
+              <Route path="/user" element={<User walletAddress={walletAddress} />} />
+              <Route path="/merchant" element={<Merchant walletAddress={walletAddress} />} />
+            </Routes>
+          </div>
+        </Router>
+      )}
     </>
   );
 }

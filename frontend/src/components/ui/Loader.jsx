@@ -8,7 +8,7 @@ export function Loader({ size = 'md' }) {
   return (
     <div className="flex items-center justify-center">
       <div
-        className={`${sizes[size]} border-4 border-blue-200 dark:border-blue-800 border-t-blue-600 dark:border-t-blue-400 rounded-full animate-spin`}
+        className={`${sizes[size]} border-3 border-gray-200 border-t-gray-900 rounded-full animate-spin`}
       />
     </div>
   );

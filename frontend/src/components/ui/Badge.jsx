@@ -2,11 +2,11 @@ import { cn } from '../../lib/utils';
 
 export function Badge({ children, variant = 'default', className }) {
   const variants = {
-    default: 'bg-slate-200 dark:bg-slate-700 text-slate-900 dark:text-slate-100',
-    success: 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300',
-    warning: 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-300',
-    error: 'bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300',
-    info: 'bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300',
+    default: 'bg-gray-100 text-gray-700 border border-gray-200',
+    success: 'bg-green-50 text-green-700 border border-green-200',
+    warning: 'bg-yellow-50 text-yellow-700 border border-yellow-200',
+    error: 'bg-red-50 text-red-700 border border-red-200',
+    info: 'bg-blue-50 text-blue-700 border border-blue-200',
   };
 
   return (

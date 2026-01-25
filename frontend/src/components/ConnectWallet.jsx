@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { isConnected, isAllowed, setAllowed, getAddress } from '@stellar/freighter-api';
 import { Button } from './ui/Button';
 import { Badge } from './ui/Badge';
-import { Wallet, CheckCircle, XCircle } from 'lucide-react';
+import { Wallet, CheckCircle } from 'lucide-react';
 import { formatAddress } from '../lib/utils';
 
 export default function ConnectWallet({ onConnect, address }) {
@@ -50,9 +50,9 @@ export default function ConnectWallet({ onConnect, address }) {
   if (address) {
     return (
       <div className="flex items-center space-x-2">
-        <Badge variant="success" className="flex items-center space-x-2">
-          <CheckCircle className="w-3 h-3" />
-          <span className="font-mono text-xs">{formatAddress(address)}</span>
+        <Badge variant="success" className="flex items-center space-x-2 px-3 py-1.5">
+          <CheckCircle className="w-3.5 h-3.5" />
+          <span className="font-mono text-xs font-medium">{formatAddress(address)}</span>
         </Badge>
       </div>
     );
@@ -63,6 +63,7 @@ export default function ConnectWallet({ onConnect, address }) {
       onClick={handleConnect}
       disabled={loading}
       size="sm"
+      variant="primary"
       className="flex items-center space-x-2"
     >
       <Wallet className="w-4 h-4" />
