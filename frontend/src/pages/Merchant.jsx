@@ -9,13 +9,14 @@ import {
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
 import { Badge } from '../components/ui/Badge';
+import ConnectWallet from '../components/ConnectWallet';
 import { formatCurrency, formatCrypto, formatDate } from '../lib/utils';
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 import axios from 'axios';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
 
-export default function Merchant({ walletAddress }) {
+export default function Merchant({ walletAddress, onConnect }) {
   const [amount, setAmount] = useState('');
   const [currency, setCurrency] = useState('USDC');
   const [order, setOrder] = useState(null);
@@ -139,13 +140,29 @@ export default function Merchant({ walletAddress }) {
     return (
       <div className="container mx-auto max-w-4xl px-4 py-24">
         <Card className="text-center">
-          <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center mx-auto mb-6 shadow-lg shadow-blue-500/20">
+          <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-gray-900 to-gray-800 flex items-center justify-center mx-auto mb-6 shadow-lg">
             <QrCode className="w-10 h-10 text-white" />
           </div>
           <CardTitle>Connect Your Wallet</CardTitle>
-          <CardDescription className="mt-3">
-            Connect your merchant wallet to start accepting payments
+          <CardDescription className="mt-3 mb-8">
+            Connect your merchant wallet to start accepting payments. You'll need the Freighter wallet extension installed.
           </CardDescription>
+          <div className="flex justify-center">
+            <ConnectWallet onConnect={onConnect} address={null} />
+          </div>
+          <div className="mt-6 p-4 bg-gray-50 rounded-xl border border-gray-200">
+            <p className="text-sm text-gray-600 mb-2">
+              <strong className="text-gray-900">Don't have Freighter?</strong>
+            </p>
+            <a
+              href="https://freighter.app"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-sm text-gray-900 hover:underline font-medium"
+            >
+              Install Freighter Wallet →
+            </a>
+          </div>
         </Card>
       </div>
     );

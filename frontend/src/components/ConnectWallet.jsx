@@ -51,7 +51,7 @@ export default function ConnectWallet({ onConnect, address }) {
     return (
       <div className="flex items-center space-x-2">
         <Badge variant="success" className="flex items-center space-x-2 px-3 py-1.5">
-          <CheckCircle className="w-3.5 h-3.5" />
+          <div className="w-2 h-2 rounded-full bg-green-500"></div>
           <span className="font-mono text-xs font-medium">{formatAddress(address)}</span>
         </Badge>
       </div>

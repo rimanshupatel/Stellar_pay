@@ -53,7 +53,11 @@ export const AuthProvider = ({ children }) => {
 
     localStorage.setItem("token", data.token);
     await fetchMe();
-    window.location.reload();
+    if(user.role=="user") {
+      window.location.href = "/user";
+    } else {
+      window.location.href = "/merchant";
+    }
   };
 
   // REGISTER
@@ -69,7 +73,11 @@ export const AuthProvider = ({ children }) => {
 
     localStorage.setItem("token", data.token);
     await fetchMe();
-    window.location.reload();
+    if(role=="user") {
+      window.location.href = "/user";
+    } else {
+      window.location.href = "/merchant";
+    }
 
   };
 

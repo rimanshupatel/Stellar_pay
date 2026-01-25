@@ -1,26 +1,43 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 0 0% 3.9%;
+    /* Base Colors */
+    --background: 0 0% 98%;
+    --foreground: 0 0% 10%;
     --card: 0 0% 100%;
-    --card-foreground: 0 0% 3.9%;
-    --primary: 221 83% 53%;
+    --card-foreground: 0 0% 10%;
+
+    /* Primary - Black */
+    --primary: 0 0% 10%;
     --primary-foreground: 0 0% 100%;
-    --secondary: 0 0% 96.1%;
-    --secondary-foreground: 0 0% 9%;
-    --muted: 0 0% 96.1%;
-    --muted-foreground: 0 0% 45.1%;
-    --accent: 0 0% 96.1%;
-    --accent-foreground: 0 0% 9%;
-    --border: 0 0% 89.8%;
-    --input: 0 0% 89.8%;
-    --ring: 221 83% 53%;
+
+    /* Secondary - Cream */
+    --secondary: 30 18% 95%;
+    --secondary-foreground: 0 0% 10%;
+
+    /* Accent - Coral */
+    --accent-coral: 16 100% 72%;
+    --accent-lime: 76 89% 57%;
+    --accent-blue: 217 91% 60%;
+
+    /* Muted */
+    --muted: 0 0% 96%;
+    --muted-foreground: 0 0% 42%;
+
+    /* Border & Input */
+    --border: 0 0% 90%;
+    --input: 0 0% 90%;
+    --ring: 0 0% 10%;
     --radius: 0.75rem;
+
+    /* Semantic Colors */
+    --success: 142 71% 45%;
+    --error: 0 84% 60%;
+    --warning: 38 92% 50%;
   }
 }
 
@@ -28,17 +45,28 @@
   * {
     @apply border-border;
   }
-  
+
   body {
-    @apply bg-[#FAFAFA] text-[#0A0A0A] font-sans antialiased;
+    @apply bg-[#FAFAFA] text-[#1A1A1A] antialiased;
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     min-height: 100vh;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    scroll-behavior: smooth;
   }
-  
-  h1, h2, h3, h4, h5, h6 {
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
     @apply font-semibold tracking-tight;
+    font-family: 'DM Sans', 'Inter', sans-serif;
+  }
+
+  .font-mono {
+    font-family: 'JetBrains Mono', monospace;
   }
 }
 
@@ -46,21 +74,59 @@
   .glass {
     @apply bg-white/80 backdrop-blur-xl border border-gray-200/50 shadow-sm;
   }
-  
+
   .glass-card {
     @apply bg-white/90 backdrop-blur-xl border border-gray-200/60 rounded-2xl shadow-lg;
   }
-  
-  .gradient-text {
-    @apply bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 bg-clip-text text-transparent;
+
+  .soft-shadow {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.06);
   }
-  
+
+  .soft-shadow-lg {
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06), 0 2px 6px rgba(0, 0, 0, 0.04);
+  }
+
+  .soft-shadow-xl {
+    box-shadow: 0 16px 48px rgba(0, 0, 0, 0.08), 0 4px 12px rgba(0, 0, 0, 0.05);
+  }
+
+  .gradient-text {
+    @apply bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 bg-clip-text text-transparent;
+  }
+
+  .gradient-coral {
+    background: linear-gradient(135deg, #FF9B71 0%, #FF7E5F 100%);
+  }
+
+  .gradient-lime {
+    background: linear-gradient(135deg, #C4F82A 0%, #9FD356 100%);
+  }
+
+  .gradient-mesh {
+    background:
+      radial-gradient(at 0% 0%, rgba(255, 155, 113, 0.15) 0px, transparent 50%),
+      radial-gradient(at 100% 0%, rgba(196, 248, 42, 0.1) 0px, transparent 50%),
+      radial-gradient(at 100% 100%, rgba(59, 130, 246, 0.1) 0px, transparent 50%),
+      radial-gradient(at 0% 100%, rgba(245, 242, 237, 0.3) 0px, transparent 50%);
+  }
+
   .card-hover {
     @apply transition-all duration-300 hover:shadow-xl hover:-translate-y-1;
   }
-  
+
   .btn-lift {
     @apply transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg active:translate-y-0;
+  }
+
+  .hover-scale {
+    @apply transition-transform duration-200 hover:scale-105;
+  }
+
+  .border-gradient {
+    border: 1px solid transparent;
+    background: linear-gradient(white, white) padding-box,
+      linear-gradient(135deg, rgba(255, 155, 113, 0.5), rgba(196, 248, 42, 0.3)) border-box;
   }
 }
 
@@ -85,6 +151,6 @@
 
 /* Selection */
 ::selection {
-  background: rgba(59, 130, 246, 0.2);
+  background: rgba(0, 0, 0, 0.1);
   color: #0A0A0A;
 }

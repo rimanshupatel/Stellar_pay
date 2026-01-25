@@ -11,6 +11,7 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '../co
 import { Button } from '../components/ui/Button';
 import { Badge } from '../components/ui/Badge';
 import { Loader } from '../components/ui/Loader';
+import ConnectWallet from '../components/ConnectWallet';
 import { STELLAR_CONFIG } from '../stellarConfig';
 import { formatCurrency, formatCrypto, formatAddress, formatDate } from '../lib/utils';
 import axios from 'axios';
@@ -38,7 +39,7 @@ const BUSY_STATUSES = [
     "Preparing Transaction..."
 ];
 
-export default function User({ walletAddress }) {
+export default function User({ walletAddress, onConnect }) {
     const [scanResult, setScanResult] = useState(null);
     const [scanning, setScanning] = useState(false);
     const [status, setStatus] = useState("");
@@ -248,13 +249,29 @@ export default function User({ walletAddress }) {
         return (
             <div className="container mx-auto max-w-4xl px-4 py-24">
                 <Card className="text-center">
-                    <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center mx-auto mb-6 shadow-lg shadow-blue-500/20">
+                    <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-gray-900 to-gray-800 flex items-center justify-center mx-auto mb-6 shadow-lg">
                         <Wallet className="w-10 h-10 text-white" />
                     </div>
                     <CardTitle>Connect Your Wallet</CardTitle>
-                    <CardDescription className="mt-3">
-                        Please connect your Stellar wallet to start making payments
+                    <CardDescription className="mt-3 mb-8">
+                        Please connect your Stellar wallet to start making payments. You'll need the Freighter wallet extension installed.
                     </CardDescription>
+                    <div className="flex justify-center">
+                        <ConnectWallet onConnect={onConnect} address={null} />
+                    </div>
+                    <div className="mt-6 p-4 bg-gray-50 rounded-xl border border-gray-200">
+                        <p className="text-sm text-gray-600 mb-2">
+                            <strong className="text-gray-900">Don't have Freighter?</strong>
+                        </p>
+                        <a
+                            href="https://freighter.app"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-sm text-gray-900 hover:underline font-medium"
+                        >
+                            Install Freighter Wallet →
+                        </a>
+                    </div>
                 </Card>
             </div>
         );
@@ -311,21 +328,19 @@ export default function User({ walletAddress }) {
             <div className="flex space-x-1 mb-8 bg-gray-100/80 rounded-full p-1.5 w-fit border border-gray-200/60">
                 <button
                     onClick={() => setActiveTab('pay')}
-                    className={`px-6 py-2.5 rounded-full text-sm font-medium transition-all duration-200 ${
-                        activeTab === 'pay'
+                    className={`px-6 py-2.5 rounded-full text-sm font-medium transition-all duration-200 ${activeTab === 'pay'
                             ? 'bg-white text-gray-900 shadow-sm'
                             : 'text-gray-600 hover:text-gray-900'
-                    }`}
+                        }`}
                 >
                     Pay
                 </button>
                 <button
                     onClick={() => setActiveTab('history')}
-                    className={`px-6 py-2.5 rounded-full text-sm font-medium transition-all duration-200 ${
-                        activeTab === 'history'
+                    className={`px-6 py-2.5 rounded-full text-sm font-medium transition-all duration-200 ${activeTab === 'history'
                             ? 'bg-white text-gray-900 shadow-sm'
                             : 'text-gray-600 hover:text-gray-900'
-                    }`}
+                        }`}
                 >
                     Transaction History
                 </button>
@@ -429,8 +444,7 @@ export default function User({ walletAddress }) {
                                     </div>
 
                                     {status && (
-                                        <div className={`p-4 rounded-xl flex items-center space-x-3 border ${
-                                            status.includes('Successful')
+                                        <div className={`p-4 rounded-xl flex items-center space-x-3 border ${status.includes('Successful')
                                                 ? 'bg-green-50 text-green-800 border-green-200'
                                                 : status.includes('Failed')
                                                     ? 'bg-red-50 text-red-800 border-red-200'
