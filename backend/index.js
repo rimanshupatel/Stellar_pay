@@ -12,7 +12,7 @@ app.use(express.json());
 
 // MongoDB connection
 let db;
-const MONGODB_URI = 'mongodb+srv://rimanshupatel3_db_user:Rishii62@cluster0.feb7kvl.mongodb.net/stellarPay';
+const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/stellarPay';
 
 async function connectDB() {
   try {
@@ -170,6 +170,20 @@ app.post('/api/transactions', async (req, res) => {
 
     if (!walletAddress || !merchantId || !cryptoAmount || !txHash) {
       return res.status(400).json({ error: 'Missing required fields' });
+    }
+
+    // Verify transaction with Stellar Horizon
+    try {
+      const { Horizon } = require('@stellar/stellar-sdk');
+      const server = new Horizon.Server('https://horizon-testnet.stellar.org');
+      const tx = await server.transactions().transaction(txHash).call();
+      
+      if (!tx.successful) {
+         return res.status(400).json({ error: 'Transaction failed on network' });
+      }
+    } catch (e) {
+      console.error('Transaction verification failed:', e);
+      return res.status(400).json({ error: 'Invalid or missing transaction on network' });
     }
 
     const transaction = {

@@ -14,7 +14,7 @@ import { formatCurrency, formatCrypto, formatDate } from '../lib/utils';
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 import axios from 'axios';
 
-const API_URL = import.meta.env.VITE_API_URL || 'https://aditya.dev-nest.tech/api';
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
 
 export default function Merchant({ walletAddress, onConnect }) {
   const [amount, setAmount] = useState('');
@@ -169,64 +169,79 @@ export default function Merchant({ walletAddress, onConnect }) {
   }
 
   return (
-    <div className="container mx-auto max-w-7xl px-4 py-24">
+    <div className="container mx-auto max-w-7xl px-4 py-24 relative z-10">
+      {/* Ambient Background */}
+      <div className="absolute inset-0 z-[-1] gradient-mesh opacity-60 pointer-events-none"></div>
+
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-10">
-        <Card>
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-gray-600 mb-1.5 font-medium">Total Revenue</p>
-              <p className="text-2xl font-bold text-gray-900">
-                {formatCurrency(stats.totalRevenue)}
-              </p>
-            </div>
-            <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-green-600 to-emerald-600 flex items-center justify-center shadow-md shadow-green-500/20">
-              <DollarSign className="w-7 h-7 text-white" />
-            </div>
-          </div>
-        </Card>
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12">
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.1 }}>
+            <Card className="glass-card card-hover border-0 overflow-hidden relative group">
+                <div className="absolute inset-0 bg-gradient-to-br from-green-50/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                <div className="flex items-center justify-between relative z-10 p-1">
+                    <div>
+                    <p className="text-xs text-gray-500 mb-1.5 font-medium tracking-wide uppercase">Total Revenue</p>
+                    <p className="text-2xl font-extrabold text-gray-900 tracking-tight">
+                        {formatCurrency(stats.totalRevenue)}
+                    </p>
+                    </div>
+                    <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-green-500 to-emerald-600 flex items-center justify-center shadow-lg shadow-green-500/30 transform group-hover:scale-110 transition-transform duration-500">
+                    <DollarSign className="w-6 h-6 text-white" />
+                    </div>
+                </div>
+            </Card>
+        </motion.div>
 
-        <Card>
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-gray-600 mb-1.5 font-medium">Today's Revenue</p>
-              <p className="text-2xl font-bold text-gray-900">
-                {formatCurrency(stats.todayRevenue)}
-              </p>
-            </div>
-            <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center shadow-md shadow-blue-500/20">
-              <TrendingUp className="w-7 h-7 text-white" />
-            </div>
-          </div>
-        </Card>
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.2 }}>
+            <Card className="glass-card card-hover border-0 overflow-hidden relative group">
+                <div className="absolute inset-0 bg-gradient-to-br from-blue-50/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                <div className="flex items-center justify-between relative z-10 p-1">
+                    <div>
+                    <p className="text-xs text-gray-500 mb-1.5 font-medium tracking-wide uppercase">Today's Revenue</p>
+                    <p className="text-2xl font-extrabold text-gray-900 tracking-tight">
+                        {formatCurrency(stats.todayRevenue)}
+                    </p>
+                    </div>
+                    <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-blue-500/30 transform group-hover:scale-110 transition-transform duration-500">
+                    <TrendingUp className="w-6 h-6 text-white" />
+                    </div>
+                </div>
+            </Card>
+        </motion.div>
 
-        <Card>
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-gray-600 mb-1.5 font-medium">Total Transactions</p>
-              <p className="text-2xl font-bold text-gray-900">
-                {stats.totalTransactions}
-              </p>
-            </div>
-            <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-purple-600 to-pink-600 flex items-center justify-center shadow-md shadow-purple-500/20">
-              <BarChartIcon className="w-7 h-7 text-white" />
-            </div>
-          </div>
-        </Card>
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.3 }}>
+            <Card className="glass-card card-hover border-0 overflow-hidden relative group">
+                <div className="absolute inset-0 bg-gradient-to-br from-purple-50/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                <div className="flex items-center justify-between relative z-10 p-1">
+                    <div>
+                    <p className="text-xs text-gray-500 mb-1.5 font-medium tracking-wide uppercase">Transactions</p>
+                    <p className="text-2xl font-extrabold text-gray-900 tracking-tight">
+                        {stats.totalTransactions}
+                    </p>
+                    </div>
+                    <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-purple-500 to-pink-600 flex items-center justify-center shadow-lg shadow-purple-500/30 transform group-hover:scale-110 transition-transform duration-500">
+                    <BarChartIcon className="w-6 h-6 text-white" />
+                    </div>
+                </div>
+            </Card>
+        </motion.div>
 
-        <Card>
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-gray-600 mb-1.5 font-medium">Pending Orders</p>
-              <p className="text-2xl font-bold text-gray-900">
-                {stats.pendingOrders}
-              </p>
-            </div>
-            <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-yellow-600 to-orange-600 flex items-center justify-center shadow-md shadow-yellow-500/20">
-              <Clock className="w-7 h-7 text-white" />
-            </div>
-          </div>
-        </Card>
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.4 }}>
+            <Card className="glass-card card-hover border-0 overflow-hidden relative group">
+                <div className="absolute inset-0 bg-gradient-to-br from-orange-50/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                <div className="flex items-center justify-between relative z-10 p-1">
+                    <div>
+                    <p className="text-xs text-gray-500 mb-1.5 font-medium tracking-wide uppercase">Pending Orders</p>
+                    <p className="text-2xl font-extrabold text-gray-900 tracking-tight">
+                        {stats.pendingOrders}
+                    </p>
+                    </div>
+                    <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-yellow-500 to-orange-500 flex items-center justify-center shadow-lg shadow-yellow-500/30 transform group-hover:scale-110 transition-transform duration-500">
+                    <Clock className="w-6 h-6 text-white" />
+                    </div>
+                </div>
+            </Card>
+        </motion.div>
       </div>
 
       {/* Tabs */}

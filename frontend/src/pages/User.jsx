@@ -17,7 +17,7 @@ import { formatCurrency, formatCrypto, formatAddress, formatDate } from '../lib/
 import axios from 'axios';
 
 const NETWORK_PASSPHRASE = "Test SDF Network ; September 2015";
-const API_URL = import.meta.env.VITE_API_URL || 'https://aditya.dev-nest.tech/api';
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
 
 function hasTrustline(account, asset) {
     if (asset.isNative()) return true;
@@ -278,50 +278,62 @@ export default function User({ walletAddress, onConnect }) {
     }
 
     return (
-        <div className="container mx-auto max-w-7xl px-4 py-24">
+        <div className="container mx-auto max-w-7xl px-4 py-24 relative z-10">
+            {/* Ambient Background */}
+            <div className="absolute inset-0 z-[-1] gradient-mesh opacity-60 pointer-events-none"></div>
+
             {/* Header Stats */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
-                <Card>
-                    <div className="flex items-center justify-between">
-                        <div>
-                            <p className="text-sm text-gray-600 mb-1.5 font-medium">XLM Balance</p>
-                            <p className="text-2xl font-bold text-gray-900">
-                                {formatCrypto(balance.xlm, 'XLM')}
-                            </p>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
+                <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.1 }}>
+                    <Card className="glass-card card-hover border-0 overflow-hidden relative group">
+                        <div className="absolute inset-0 bg-gradient-to-br from-blue-50/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                        <div className="flex items-center justify-between relative z-10 p-2">
+                            <div>
+                                <p className="text-sm text-gray-500 mb-1.5 font-medium tracking-wide uppercase">XLM Balance</p>
+                                <p className="text-3xl font-extrabold text-gray-900 tracking-tight">
+                                    {formatCrypto(balance.xlm, 'XLM')}
+                                </p>
+                            </div>
+                            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-blue-500/30 transform group-hover:scale-110 transition-transform duration-500">
+                                <Wallet className="w-8 h-8 text-white" />
+                            </div>
                         </div>
-                        <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center shadow-md shadow-blue-500/20">
-                            <Wallet className="w-7 h-7 text-white" />
-                        </div>
-                    </div>
-                </Card>
+                    </Card>
+                </motion.div>
 
-                <Card>
-                    <div className="flex items-center justify-between">
-                        <div>
-                            <p className="text-sm text-gray-600 mb-1.5 font-medium">USDC Balance</p>
-                            <p className="text-2xl font-bold text-gray-900">
-                                {formatCrypto(balance.usdc, 'USDC')}
-                            </p>
+                <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.2 }}>
+                    <Card className="glass-card card-hover border-0 overflow-hidden relative group">
+                        <div className="absolute inset-0 bg-gradient-to-br from-emerald-50/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                        <div className="flex items-center justify-between relative z-10 p-2">
+                            <div>
+                                <p className="text-sm text-gray-500 mb-1.5 font-medium tracking-wide uppercase">USDC Balance</p>
+                                <p className="text-3xl font-extrabold text-gray-900 tracking-tight">
+                                    {formatCrypto(balance.usdc, 'USDC')}
+                                </p>
+                            </div>
+                            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-emerald-400 to-teal-500 flex items-center justify-center shadow-lg shadow-emerald-500/30 transform group-hover:scale-110 transition-transform duration-500">
+                                <TrendingUp className="w-8 h-8 text-white" />
+                            </div>
                         </div>
-                        <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-green-600 to-emerald-600 flex items-center justify-center shadow-md shadow-green-500/20">
-                            <TrendingUp className="w-7 h-7 text-white" />
-                        </div>
-                    </div>
-                </Card>
+                    </Card>
+                </motion.div>
 
-                <Card>
-                    <div className="flex items-center justify-between">
-                        <div>
-                            <p className="text-sm text-gray-600 mb-1.5 font-medium">Total Payments</p>
-                            <p className="text-2xl font-bold text-gray-900">
-                                {transactions.length}
-                            </p>
+                <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.3 }}>
+                    <Card className="glass-card card-hover border-0 overflow-hidden relative group">
+                        <div className="absolute inset-0 bg-gradient-to-br from-purple-50/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                        <div className="flex items-center justify-between relative z-10 p-2">
+                            <div>
+                                <p className="text-sm text-gray-500 mb-1.5 font-medium tracking-wide uppercase">Total Payments</p>
+                                <p className="text-3xl font-extrabold text-gray-900 tracking-tight">
+                                    {transactions.length}
+                                </p>
+                            </div>
+                            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center shadow-lg shadow-purple-500/30 transform group-hover:scale-110 transition-transform duration-500">
+                                <History className="w-8 h-8 text-white" />
+                            </div>
                         </div>
-                        <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-purple-600 to-pink-600 flex items-center justify-center shadow-md shadow-purple-500/20">
-                            <History className="w-7 h-7 text-white" />
-                        </div>
-                    </div>
-                </Card>
+                    </Card>
+                </motion.div>
             </div>
 
             {/* Tabs */}
