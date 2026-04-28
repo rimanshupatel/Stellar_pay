@@ -180,8 +180,8 @@ impl StellarPayContract {
 #[cfg(test)]
 mod test {
     use super::*;
-    use soroban_sdk::testutils::{Address as _, Events};
-    use soroban_sdk::{token, vec, IntoVal, Symbol, String};
+    use soroban_sdk::testutils::{Address as _, MockAuth, MockAuthInvoke};
+    use soroban_sdk::{token, Symbol, String};
 
     #[test]
     fn test_escrow_flow() {
@@ -190,7 +190,7 @@ mod test {
         let client = StellarPayContractClient::new(&env, &contract_id);
 
         let token_admin = Address::generate(&env);
-        let token_contract = env.register_stellar_asset_contract(token_admin.clone());
+        let token_contract = env.register_stellar_asset_contract_v2(token_admin.clone()).address();
         let token_client = token::Client::new(&env, &token_contract);
         let token_admin_client = token::StellarAssetClient::new(&env, &token_contract);
 
@@ -200,7 +200,7 @@ mod test {
         let tx_hash = String::from_str(&env, "dummy_tx_hash");
 
         // Mint tokens to buyer
-        token_admin_client.mint(&buyer, &1000);
+        token_admin_client.mock_all_auths().mint(&buyer, &1000);
         assert_eq!(token_client.balance(&buyer), 1000);
 
         env.mock_all_auths();
@@ -234,7 +234,7 @@ mod test {
         let client = StellarPayContractClient::new(&env, &contract_id);
 
         let token_admin = Address::generate(&env);
-        let token_contract = env.register_stellar_asset_contract(token_admin.clone());
+        let token_contract = env.register_stellar_asset_contract_v2(token_admin.clone()).address();
         let token_client = token::Client::new(&env, &token_contract);
         let token_admin_client = token::StellarAssetClient::new(&env, &token_contract);
 
@@ -243,9 +243,9 @@ mod test {
         let ref_id = Symbol::new(&env, "order_456");
         let tx_hash = String::from_str(&env, "dummy_tx_hash2");
 
-        token_admin_client.mint(&buyer, &1000);
+        token_admin_client.mock_all_auths().mint(&buyer, &1000);
 
-        env.mock_all_auths();
+        env.mock_all_auths();   
 
         client.create_order(&merchant, &token_contract, &100, &ref_id);
         client.mark_paid(&buyer, &ref_id, &tx_hash);
