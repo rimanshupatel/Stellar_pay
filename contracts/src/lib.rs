@@ -167,6 +167,14 @@ impl StellarPayContract {
 
         env.events().publish((symbol_short!("refund"), ref_id), order.buyer);
     }
+    /// Get order details - enables inter-contract calls
+    pub fn get_order(env: Env, ref_id: Symbol) -> Order {
+        let order_key = DataKey::Order(ref_id);
+        env.storage()
+            .persistent()
+            .get(&order_key)
+            .unwrap_or_else(|| panic!("order not found"))
+    }
 }
 
 #[cfg(test)]
