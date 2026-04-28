@@ -13,6 +13,9 @@ import ConnectWallet from '../components/ConnectWallet';
 import { formatCurrency, formatCrypto, formatDate } from '../lib/utils';
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 import axios from 'axios';
+import { signTransaction } from '@stellar/freighter-api';
+import { TransactionBuilder, Horizon, rpc, Contract, Address, xdr, nativeToScVal, BASE_FEE, Asset } from '@stellar/stellar-sdk';
+import { STELLAR_CONFIG } from '../stellarConfig';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
 
@@ -95,17 +98,131 @@ export default function Merchant({ walletAddress, onConnect }) {
         })
       });
       const data = await res.json();
+      const shortRefId = (data.refId || 'ord' + Date.now()).slice(-9);
+      if (STELLAR_CONFIG.paymentContractId) {
+        const server = new Horizon.Server(STELLAR_CONFIG.horizonUrl);
+        const source = await server.loadAccount(walletAddress);
+
+        const contract = new Contract(STELLAR_CONFIG.paymentContractId);
+        const assetContractId = STELLAR_CONFIG.assets[currency]?.contractId
+          || STELLAR_CONFIG.assets.XLM.contractId;
+
+        const amountStroops = Math.floor(parseFloat(amount) * 1e7);
+
+        const op = contract.call(
+          'deposit',
+          new Address(walletAddress).toScVal(),   // buyer (merchant creates the order)
+          new Address(walletAddress).toScVal(),   // merchant (same for now)
+          new Address(assetContractId).toScVal(), // token
+          nativeToScVal(amountStroops, { type: 'i128' }), // amount
+          xdr.ScVal.scvSymbol(shortRefId)         // ref_id
+        );
+
+        let tx = new TransactionBuilder(source, {
+          fee: BASE_FEE,
+          networkPassphrase: STELLAR_CONFIG.networkPassphrase
+        })
+          .addOperation(op)
+          .setTimeout(30)
+          .build();
+
+        const rpcServer = new rpc.Server(STELLAR_CONFIG.rpcUrl);
+        const sim = await rpcServer.simulateTransaction(tx);
+
+        // FIX: proper simulation check
+        if (rpc.Api.isSimulationError(sim)) {
+          throw new Error("Simulation failed: " + sim.error);
+        }
+
+        if (rpc.Api.isSimulationRestore(sim)) {
+          throw new Error("Simulation requires restore (footprint expired).");
+        }
+
+        // FIX: use assembleTransaction correctly
+        tx = rpc.assembleTransaction(tx, sim).build();
+
+        const signedTx = await signTransaction(tx.toXDR(), {
+          network: "TESTNET",
+          networkPassphrase: STELLAR_CONFIG.networkPassphrase
+        });
+
+        if (signedTx.error) throw new Error(signedTx.error);
+
+        const signedTransaction = TransactionBuilder.fromXDR(
+          signedTx.signedTxXdr,
+          STELLAR_CONFIG.networkPassphrase
+        );
+        const sendResponse = await rpcServer.sendTransaction(signedTransaction);
+        if (sendResponse.status === "ERROR") throw new Error("Transaction submission failed");
+
+        let txStatus = await rpcServer.getTransaction(sendResponse.hash);
+        let attempts = 0;
+        while (txStatus.status === "NOT_FOUND" && attempts < 15) {
+          await new Promise(resolve => setTimeout(resolve, 2000));
+          txStatus = await rpcServer.getTransaction(sendResponse.hash);
+          attempts++;
+        }
+        if (txStatus.status !== "SUCCESS") throw new Error(`Transaction failed: ${txStatus.status}`);
+      }
+
       setOrder(data);
       setReleased(false);
     } catch (e) {
       console.error(e);
-      alert("Failed to generate QR");
+      alert("Failed to generate QR or create order on-chain: " + e.message);
     }
   };
 
   const handleRelease = async () => {
     if (!order) return;
     try {
+      if (STELLAR_CONFIG.paymentContractId) {
+        const server = new Horizon.Server(STELLAR_CONFIG.horizonUrl);
+        const source = await server.loadAccount(walletAddress);
+
+        const contract = new Contract(STELLAR_CONFIG.paymentContractId);
+        const op = contract.call(
+          'release',
+          new Address(walletAddress).toScVal(),  // merchant
+          xdr.ScVal.scvSymbol(order.refId)       // ref_id
+        );
+
+        let tx = new TransactionBuilder(source, {
+          fee: BASE_FEE,
+          networkPassphrase: STELLAR_CONFIG.networkPassphrase
+        })
+          .addOperation(op)
+          .setTimeout(30)
+          .build();
+
+        const rpcServer = new rpc.Server(STELLAR_CONFIG.rpcUrl);
+        const sim = await rpcServer.simulateTransaction(tx);
+        if (sim.error) throw new Error("Simulation failed: " + sim.error);
+        if (!rpc.Api.isSimulationSuccess(sim)) {
+          if (rpc.Api.isSimulationRestore(sim)) throw new Error("Simulation requires restore (footprint expired).");
+          throw new Error("Simulation failed: Check console for details");
+        }
+        if (!sim.result) sim.result = sim.results ? sim.results[0] : { auth: [] };
+        if (!sim.result.auth) sim.result.auth = [];
+        tx = rpc.assembleTransaction(tx, sim).build();
+
+        const signedTx = await signTransaction(tx.toXDR(), { network: "TESTNET", networkPassphrase: STELLAR_CONFIG.networkPassphrase });
+        if (signedTx.error) throw new Error(signedTx.error);
+
+        const signedTransaction = TransactionBuilder.fromXDR(signedTx.signedTxXdr, STELLAR_CONFIG.networkPassphrase);
+        const sendResponse = await rpcServer.sendTransaction(signedTransaction);
+        if (sendResponse.status === "ERROR") throw new Error("Transaction submission failed");
+
+        let txStatus = await rpcServer.getTransaction(sendResponse.hash);
+        let attempts = 0;
+        while (txStatus.status === "NOT_FOUND" && attempts < 15) {
+          await new Promise(resolve => setTimeout(resolve, 2000));
+          txStatus = await rpcServer.getTransaction(sendResponse.hash);
+          attempts++;
+        }
+        if (txStatus.status !== "SUCCESS") throw new Error(`Transaction failed: ${txStatus.status}`);
+      }
+
       await fetch(`${API_URL}/release-order`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -117,6 +234,7 @@ export default function Merchant({ walletAddress, onConnect }) {
       loadStats();
     } catch (e) {
       console.error(e);
+      alert("Failed to release funds: " + e.message);
     }
   };
 
@@ -176,71 +294,71 @@ export default function Merchant({ walletAddress, onConnect }) {
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.1 }}>
-            <Card className="glass-card card-hover border-0 overflow-hidden relative group">
-                <div className="absolute inset-0 bg-gradient-to-br from-green-50/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                <div className="flex items-center justify-between relative z-10 p-1">
-                    <div>
-                    <p className="text-xs text-gray-500 mb-1.5 font-medium tracking-wide uppercase">Total Revenue</p>
-                    <p className="text-2xl font-extrabold text-gray-900 tracking-tight">
-                        {formatCurrency(stats.totalRevenue)}
-                    </p>
-                    </div>
-                    <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-green-500 to-emerald-600 flex items-center justify-center shadow-lg shadow-green-500/30 transform group-hover:scale-110 transition-transform duration-500">
-                    <DollarSign className="w-6 h-6 text-white" />
-                    </div>
-                </div>
-            </Card>
+          <Card className="glass-card card-hover border-0 overflow-hidden relative group">
+            <div className="absolute inset-0 bg-gradient-to-br from-green-50/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+            <div className="flex items-center justify-between relative z-10 p-1">
+              <div>
+                <p className="text-xs text-gray-500 mb-1.5 font-medium tracking-wide uppercase">Total Revenue</p>
+                <p className="text-2xl font-extrabold text-gray-900 tracking-tight">
+                  {formatCurrency(stats.totalRevenue)}
+                </p>
+              </div>
+              <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-green-500 to-emerald-600 flex items-center justify-center shadow-lg shadow-green-500/30 transform group-hover:scale-110 transition-transform duration-500">
+                <DollarSign className="w-6 h-6 text-white" />
+              </div>
+            </div>
+          </Card>
         </motion.div>
 
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.2 }}>
-            <Card className="glass-card card-hover border-0 overflow-hidden relative group">
-                <div className="absolute inset-0 bg-gradient-to-br from-blue-50/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                <div className="flex items-center justify-between relative z-10 p-1">
-                    <div>
-                    <p className="text-xs text-gray-500 mb-1.5 font-medium tracking-wide uppercase">Today's Revenue</p>
-                    <p className="text-2xl font-extrabold text-gray-900 tracking-tight">
-                        {formatCurrency(stats.todayRevenue)}
-                    </p>
-                    </div>
-                    <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-blue-500/30 transform group-hover:scale-110 transition-transform duration-500">
-                    <TrendingUp className="w-6 h-6 text-white" />
-                    </div>
-                </div>
-            </Card>
+          <Card className="glass-card card-hover border-0 overflow-hidden relative group">
+            <div className="absolute inset-0 bg-gradient-to-br from-blue-50/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+            <div className="flex items-center justify-between relative z-10 p-1">
+              <div>
+                <p className="text-xs text-gray-500 mb-1.5 font-medium tracking-wide uppercase">Today's Revenue</p>
+                <p className="text-2xl font-extrabold text-gray-900 tracking-tight">
+                  {formatCurrency(stats.todayRevenue)}
+                </p>
+              </div>
+              <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-blue-500/30 transform group-hover:scale-110 transition-transform duration-500">
+                <TrendingUp className="w-6 h-6 text-white" />
+              </div>
+            </div>
+          </Card>
         </motion.div>
 
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.3 }}>
-            <Card className="glass-card card-hover border-0 overflow-hidden relative group">
-                <div className="absolute inset-0 bg-gradient-to-br from-purple-50/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                <div className="flex items-center justify-between relative z-10 p-1">
-                    <div>
-                    <p className="text-xs text-gray-500 mb-1.5 font-medium tracking-wide uppercase">Transactions</p>
-                    <p className="text-2xl font-extrabold text-gray-900 tracking-tight">
-                        {stats.totalTransactions}
-                    </p>
-                    </div>
-                    <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-purple-500 to-pink-600 flex items-center justify-center shadow-lg shadow-purple-500/30 transform group-hover:scale-110 transition-transform duration-500">
-                    <BarChartIcon className="w-6 h-6 text-white" />
-                    </div>
-                </div>
-            </Card>
+          <Card className="glass-card card-hover border-0 overflow-hidden relative group">
+            <div className="absolute inset-0 bg-gradient-to-br from-purple-50/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+            <div className="flex items-center justify-between relative z-10 p-1">
+              <div>
+                <p className="text-xs text-gray-500 mb-1.5 font-medium tracking-wide uppercase">Transactions</p>
+                <p className="text-2xl font-extrabold text-gray-900 tracking-tight">
+                  {stats.totalTransactions}
+                </p>
+              </div>
+              <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-purple-500 to-pink-600 flex items-center justify-center shadow-lg shadow-purple-500/30 transform group-hover:scale-110 transition-transform duration-500">
+                <BarChartIcon className="w-6 h-6 text-white" />
+              </div>
+            </div>
+          </Card>
         </motion.div>
 
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.4 }}>
-            <Card className="glass-card card-hover border-0 overflow-hidden relative group">
-                <div className="absolute inset-0 bg-gradient-to-br from-orange-50/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                <div className="flex items-center justify-between relative z-10 p-1">
-                    <div>
-                    <p className="text-xs text-gray-500 mb-1.5 font-medium tracking-wide uppercase">Pending Orders</p>
-                    <p className="text-2xl font-extrabold text-gray-900 tracking-tight">
-                        {stats.pendingOrders}
-                    </p>
-                    </div>
-                    <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-yellow-500 to-orange-500 flex items-center justify-center shadow-lg shadow-yellow-500/30 transform group-hover:scale-110 transition-transform duration-500">
-                    <Clock className="w-6 h-6 text-white" />
-                    </div>
-                </div>
-            </Card>
+          <Card className="glass-card card-hover border-0 overflow-hidden relative group">
+            <div className="absolute inset-0 bg-gradient-to-br from-orange-50/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+            <div className="flex items-center justify-between relative z-10 p-1">
+              <div>
+                <p className="text-xs text-gray-500 mb-1.5 font-medium tracking-wide uppercase">Pending Orders</p>
+                <p className="text-2xl font-extrabold text-gray-900 tracking-tight">
+                  {stats.pendingOrders}
+                </p>
+              </div>
+              <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-yellow-500 to-orange-500 flex items-center justify-center shadow-lg shadow-yellow-500/30 transform group-hover:scale-110 transition-transform duration-500">
+                <Clock className="w-6 h-6 text-white" />
+              </div>
+            </div>
+          </Card>
         </motion.div>
       </div>
 
@@ -249,8 +367,8 @@ export default function Merchant({ walletAddress, onConnect }) {
         <button
           onClick={() => setActiveTab('dashboard')}
           className={`px-6 py-2.5 rounded-full text-sm font-medium transition-all duration-200 ${activeTab === 'dashboard'
-              ? 'bg-white text-gray-900 shadow-sm'
-              : 'text-gray-600 hover:text-gray-900'
+            ? 'bg-white text-gray-900 shadow-sm'
+            : 'text-gray-600 hover:text-gray-900'
             }`}
         >
           Dashboard
@@ -258,8 +376,8 @@ export default function Merchant({ walletAddress, onConnect }) {
         <button
           onClick={() => setActiveTab('qr')}
           className={`px-6 py-2.5 rounded-full text-sm font-medium transition-all duration-200 ${activeTab === 'qr'
-              ? 'bg-white text-gray-900 shadow-sm'
-              : 'text-gray-600 hover:text-gray-900'
+            ? 'bg-white text-gray-900 shadow-sm'
+            : 'text-gray-600 hover:text-gray-900'
             }`}
         >
           Generate QR
@@ -267,8 +385,8 @@ export default function Merchant({ walletAddress, onConnect }) {
         <button
           onClick={() => setActiveTab('history')}
           className={`px-6 py-2.5 rounded-full text-sm font-medium transition-all duration-200 ${activeTab === 'history'
-              ? 'bg-white text-gray-900 shadow-sm'
-              : 'text-gray-600 hover:text-gray-900'
+            ? 'bg-white text-gray-900 shadow-sm'
+            : 'text-gray-600 hover:text-gray-900'
             }`}
         >
           Transaction History

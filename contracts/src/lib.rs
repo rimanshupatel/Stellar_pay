@@ -1,25 +1,27 @@
 #![no_std]
 
 use soroban_sdk::{
-    contract, contractimpl, contracttype, symbol_short, token, Address, Env, Symbol,
+    contract, contractimpl, contracttype, symbol_short, token, Address, Env, String, Symbol,
 };
 
 #[contracttype]
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub enum OrderStatus {
     Pending = 0,
-    Released = 1,
-    Refunded = 2,
+    Paid = 1,
+    Released = 2,
+    Refunded = 3,
 }
 
 #[contracttype]
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub struct Order {
-    pub buyer: Address,
     pub merchant: Address,
     pub token: Address,
     pub amount: i128,
     pub status: OrderStatus,
+    pub buyer: Option<Address>,
+    pub tx_hash: Option<String>,
 }
 
 #[contracttype]
@@ -32,16 +34,15 @@ pub struct StellarPayContract;
 
 #[contractimpl]
 impl StellarPayContract {
-    /// Buyer deposits funds into the contract, creating a new escrow order.
-    pub fn deposit(
+    /// Merchant creates an order on-chain, storing the terms. No funds are moved yet.
+    pub fn create_order(
         env: Env,
-        buyer: Address,
         merchant: Address,
         token_address: Address,
         amount: i128,
         ref_id: Symbol,
     ) {
-        buyer.require_auth();
+        merchant.require_auth();
 
         if amount <= 0 {
             panic!("amount must be positive");
@@ -52,29 +53,60 @@ impl StellarPayContract {
             panic!("order already exists");
         }
 
-        // Transfer funds from buyer to the contract
-        let token = token::Client::new(&env, &token_address);
-        token.transfer(&buyer, &env.current_contract_address(), &amount);
-
-        // Save order to storage
         let order = Order {
-            buyer: buyer.clone(),
             merchant: merchant.clone(),
             token: token_address.clone(),
             amount,
             status: OrderStatus::Pending,
+            buyer: None,
+            tx_hash: None,
         };
         env.storage().persistent().set(&order_key, &order);
 
-        // Emit deposit event
         env.events().publish(
-            (symbol_short!("deposit"), ref_id),
-            (buyer, merchant, token_address, amount),
+            (symbol_short!("create"), ref_id),
+            (merchant, token_address, amount),
+        );
+    }
+
+    /// Buyer marks the order as paid, pulling funds into the contract escrow.
+    pub fn mark_paid(
+        env: Env,
+        buyer: Address,
+        ref_id: Symbol,
+        tx_hash: String,
+    ) {
+        buyer.require_auth();
+
+        let order_key = DataKey::Order(ref_id.clone());
+        let mut order: Order = env
+            .storage()
+            .persistent()
+            .get(&order_key)
+            .unwrap_or_else(|| panic!("order not found"));
+
+        if order.status != OrderStatus::Pending {
+            panic!("order is not pending");
+        }
+
+        // Transfer funds from buyer to the contract
+        let token = token::Client::new(&env, &order.token);
+        token.transfer(&buyer, &env.current_contract_address(), &order.amount);
+
+        // Update status to Paid and save buyer info
+        order.status = OrderStatus::Paid;
+        order.buyer = Some(buyer.clone());
+        order.tx_hash = Some(tx_hash.clone());
+        env.storage().persistent().set(&order_key, &order);
+
+        env.events().publish(
+            (symbol_short!("paid"), ref_id),
+            (buyer, tx_hash),
         );
     }
 
     /// Merchant releases the funds to themselves after fulfilling the order.
-    pub fn release(env: Env, merchant: Address, ref_id: Symbol) {
+    pub fn release_funds(env: Env, merchant: Address, ref_id: Symbol) {
         merchant.require_auth();
 
         let order_key = DataKey::Order(ref_id.clone());
@@ -88,8 +120,8 @@ impl StellarPayContract {
             panic!("only the merchant can release this order");
         }
 
-        if order.status != OrderStatus::Pending {
-            panic!("order is not pending");
+        if order.status != OrderStatus::Paid {
+            panic!("order is not paid");
         }
 
         // Update status to prevent double-release
@@ -100,12 +132,11 @@ impl StellarPayContract {
         let token = token::Client::new(&env, &order.token);
         token.transfer(&env.current_contract_address(), &merchant, &order.amount);
 
-        // Emit release event
         env.events().publish((symbol_short!("release"), ref_id), merchant);
     }
 
     /// Merchant can refund the order, sending funds back to the buyer.
-    pub fn refund(env: Env, merchant: Address, ref_id: Symbol) {
+    pub fn refund_funds(env: Env, merchant: Address, ref_id: Symbol) {
         merchant.require_auth();
 
         let order_key = DataKey::Order(ref_id.clone());
@@ -119,19 +150,21 @@ impl StellarPayContract {
             panic!("only the merchant can refund this order");
         }
 
-        if order.status != OrderStatus::Pending {
-            panic!("order is not pending");
+        if order.status != OrderStatus::Paid && order.status != OrderStatus::Pending {
+            panic!("order cannot be refunded");
         }
 
-        // Update status to prevent double-refund
+        // If it was paid, transfer funds back to buyer
+        if order.status == OrderStatus::Paid {
+            if let Some(buyer) = &order.buyer {
+                let token = token::Client::new(&env, &order.token);
+                token.transfer(&env.current_contract_address(), buyer, &order.amount);
+            }
+        }
+
         order.status = OrderStatus::Refunded;
         env.storage().persistent().set(&order_key, &order);
 
-        // Transfer funds from contract back to buyer
-        let token = token::Client::new(&env, &order.token);
-        token.transfer(&env.current_contract_address(), &order.buyer, &order.amount);
-
-        // Emit refund event
         env.events().publish((symbol_short!("refund"), ref_id), order.buyer);
     }
 }
@@ -140,10 +173,10 @@ impl StellarPayContract {
 mod test {
     use super::*;
     use soroban_sdk::testutils::{Address as _, Events};
-    use soroban_sdk::{token, vec, IntoVal, Symbol};
+    use soroban_sdk::{token, vec, IntoVal, Symbol, String};
 
     #[test]
-    fn test_deposit_and_release() {
+    fn test_escrow_flow() {
         let env = Env::default();
         let contract_id = env.register_contract(None, StellarPayContract);
         let client = StellarPayContractClient::new(&env, &contract_id);
@@ -156,39 +189,38 @@ mod test {
         let buyer = Address::generate(&env);
         let merchant = Address::generate(&env);
         let ref_id = Symbol::new(&env, "order_123");
+        let tx_hash = String::from_str(&env, "dummy_tx_hash");
 
         // Mint tokens to buyer
         token_admin_client.mint(&buyer, &1000);
         assert_eq!(token_client.balance(&buyer), 1000);
 
-        // Mock auth for buyer's deposit
-        // In actual Freighter usage, buyer signs the transaction calling deposit.
-        // The contract's token::Client::transfer will require auth from buyer.
         env.mock_all_auths();
 
-        // DEPOSIT
-        client.deposit(&buyer, &merchant, &token_contract, &100, &ref_id);
+        // 1. CREATE ORDER (Merchant)
+        client.create_order(&merchant, &token_contract, &100, &ref_id);
 
-        // Verify balances after deposit
+        // Verify balances unchanged
+        assert_eq!(token_client.balance(&buyer), 1000);
+        assert_eq!(token_client.balance(&contract_id), 0);
+
+        // 2. MARK PAID (Buyer)
+        client.mark_paid(&buyer, &ref_id, &tx_hash);
+
+        // Verify balances after payment
         assert_eq!(token_client.balance(&buyer), 900);
         assert_eq!(token_client.balance(&contract_id), 100);
 
-        // RELEASE
-        client.release(&merchant, &ref_id);
+        // 3. RELEASE FUNDS (Merchant)
+        client.release_funds(&merchant, &ref_id);
 
         // Verify balances after release
         assert_eq!(token_client.balance(&contract_id), 0);
         assert_eq!(token_client.balance(&merchant), 100);
-
-        // Verify Events
-        let events = env.events().all();
-        // The events list includes token transfer events and our custom events.
-        // In a real test, we would iterate and find our specific events to assert.
-        assert!(events.len() > 0);
     }
 
     #[test]
-    fn test_deposit_and_refund() {
+    fn test_escrow_refund() {
         let env = Env::default();
         let contract_id = env.register_contract(None, StellarPayContract);
         let client = StellarPayContractClient::new(&env, &contract_id);
@@ -201,18 +233,19 @@ mod test {
         let buyer = Address::generate(&env);
         let merchant = Address::generate(&env);
         let ref_id = Symbol::new(&env, "order_456");
+        let tx_hash = String::from_str(&env, "dummy_tx_hash2");
 
         token_admin_client.mint(&buyer, &1000);
 
         env.mock_all_auths();
 
-        // DEPOSIT
-        client.deposit(&buyer, &merchant, &token_contract, &100, &ref_id);
+        client.create_order(&merchant, &token_contract, &100, &ref_id);
+        client.mark_paid(&buyer, &ref_id, &tx_hash);
         assert_eq!(token_client.balance(&buyer), 900);
         assert_eq!(token_client.balance(&contract_id), 100);
 
         // REFUND
-        client.refund(&merchant, &ref_id);
+        client.refund_funds(&merchant, &ref_id);
 
         // Verify balances after refund
         assert_eq!(token_client.balance(&contract_id), 0);

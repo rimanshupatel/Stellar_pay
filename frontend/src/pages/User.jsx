@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Html5QrcodeScanner } from 'html5-qrcode';
 import { signTransaction } from '@stellar/freighter-api';
-import { TransactionBuilder, Horizon, Asset, BASE_FEE, Operation } from '@stellar/stellar-sdk';
+import { TransactionBuilder, Horizon, Asset, BASE_FEE, Operation, Contract, Address, xdr, rpc } from '@stellar/stellar-sdk';
 import {
     QrCode, Wallet, CheckCircle, XCircle,
     Clock, TrendingUp, Scan, X, AlertCircle, History
@@ -15,7 +15,7 @@ import ConnectWallet from '../components/ConnectWallet';
 import { STELLAR_CONFIG } from '../stellarConfig';
 import { formatCurrency, formatCrypto, formatAddress, formatDate } from '../lib/utils';
 import axios from 'axios';
-
+import { nativeToScVal } from '@stellar/stellar-sdk';
 const NETWORK_PASSPHRASE = "Test SDF Network ; September 2015";
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
 
@@ -149,17 +149,43 @@ export default function User({ walletAddress, onConnect }) {
                 asset = Asset.native();
             }
 
-            const tx = new TransactionBuilder(source, {
+            let tx = new TransactionBuilder(source, {
                 fee: BASE_FEE,
                 networkPassphrase: NETWORK_PASSPHRASE
-            })
-                .addOperation(Operation.payment({
+            });
+
+            if (STELLAR_CONFIG.paymentContractId) {
+                const contract = new Contract(STELLAR_CONFIG.paymentContractId);
+                const assetContractId = STELLAR_CONFIG.assets[scanResult.currency]?.contractId
+                    || STELLAR_CONFIG.assets.USDC.contractId;
+                const op = contract.call(
+                    'deposit',
+                    new Address(walletAddress).toScVal(),        // buyer
+                    new Address(scanResult.merchant).toScVal(),  // merchant
+                    new Address(assetContractId).toScVal(),      // token
+                    nativeToScVal(Math.floor(parseFloat(scanResult.amount) * 1e7), { type: 'i128' }), // amount
+                    xdr.ScVal.scvSymbol(scanResult.refId)        // ref_id
+                );
+                tx = tx.addOperation(op).setTimeout(30).build();
+
+                setStatus("Simulating Smart Contract Call...");
+                const rpcServer = new rpc.Server(STELLAR_CONFIG.rpcUrl);
+                const sim = await rpcServer.simulateTransaction(tx);
+                if (sim.error) throw new Error("Simulation failed: " + sim.error);
+                if (!rpc.Api.isSimulationSuccess(sim)) {
+                    if (rpc.Api.isSimulationRestore(sim)) throw new Error("Simulation requires restore.");
+                    throw new Error("Simulation failed: Check console");
+                }
+                if (!sim.result) sim.result = sim.results ? sim.results[0] : { auth: [] };
+                if (!sim.result.auth) sim.result.auth = [];
+                tx = rpc.assembleTransaction(tx, sim).build();
+            } else {
+                tx = tx.addOperation(Operation.payment({
                     destination: scanResult.merchant,
                     asset: asset,
                     amount: String(scanResult.amount)
-                }))
-                .setTimeout(30)
-                .build();
+                })).setTimeout(30).build();
+            }
 
             setStatus("Signing with Freighter...");
             const signedTx = await signTransaction(tx.toXDR(), {
@@ -177,7 +203,26 @@ export default function User({ walletAddress, onConnect }) {
 
             setStatus("Submitting to Network...");
             const signedTransaction = TransactionBuilder.fromXDR(signedTx.signedTxXdr, NETWORK_PASSPHRASE);
-            const result = await server.submitTransaction(signedTransaction);
+
+            let result;
+            if (STELLAR_CONFIG.paymentContractId) {
+                const rpcServer = new rpc.Server(STELLAR_CONFIG.rpcUrl);
+                const sendResponse = await rpcServer.sendTransaction(signedTransaction);
+                if (sendResponse.status === "ERROR") throw new Error("Transaction submission failed");
+
+                setStatus("Waiting for confirmation...");
+                let txStatus = await rpcServer.getTransaction(sendResponse.hash);
+                let attempts = 0;
+                while (txStatus.status === "NOT_FOUND" && attempts < 15) {
+                    await new Promise(resolve => setTimeout(resolve, 2000));
+                    txStatus = await rpcServer.getTransaction(sendResponse.hash);
+                    attempts++;
+                }
+                if (txStatus.status !== "SUCCESS") throw new Error(`Transaction failed: ${txStatus.status}`);
+                result = { hash: sendResponse.hash };
+            } else {
+                result = await server.submitTransaction(signedTransaction);
+            }
 
             // Save to database
             try {
