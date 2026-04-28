@@ -18,21 +18,73 @@ A **production-grade fintech mini-dApp** built on the **Stellar blockchain + Sor
 ---
 
 ## 🏆 Stellar Journey to Master
+## 🧭 Belt System Progress
+ 
+| Level | Belt | Focus | Status |
+|-------|------|-------|--------|
+| ⚪️ Level 1 | White Belt | Wallets & transactions | ✅ Completed |
+| 🟡 Level 2 | Yellow Belt | Multi-wallet, contracts & events | ✅ Completed |
+| 🟠 Level 3 | Orange Belt | Mini dApp + tests | ✅ Completed |
+| 🟢 Level 4 | Green Belt | Advanced contracts & production readiness | ✅ Completed |
+| 🔵 Level 5 | Blue Belt | Real MVP (5+ users) | 🔜 Upcoming |
+| ⚫️ Level 6 | Black Belt | Scale + Demo Day readiness | 🔜 Upcoming |
+ 
+---
+ 
+## 🟢 Current Status: GREEN BELT (Completed)
+ 
+---
+ 
+## ✅ Green Belt Checklist
+ 
+### 📦 Smart Contract (Soroban)
+- ✔ Contract written in Rust with `no_std` and Soroban SDK
+- ✔ WASM optimized with `opt-level = z`, `lto`, `overflow-checks`
+- ✔ Deployed successfully on **Stellar Testnet**
+- ✔ Contract ID: `CBKMPCT4RSI2NHJJILN7K5K6FB2ZVD7EYCB5G37UT47GJLCPZOZXYMNT`
+### ⚙️ Core Contract Functions (6 Exported)
+- ✔ `create_order` — Merchant creates an escrow order on-chain
+- ✔ `mark_paid` — Buyer locks funds into escrow
+- ✔ `release_funds` — Merchant releases funds after fulfillment
+- ✔ `refund_funds` — Merchant refunds buyer on cancellation
+- ✔ `get_order` — Inter-contract call to query order details
+- ✔ Duplicate order protection (panics on existing `ref_id`)
+### 🔗 Inter-Contract Call
+- ✔ `get_order` function implemented and tested
+- ✔ Returns full order struct: `amount`, `merchant`, `buyer`, `status`, `token`, `tx_hash`
+- ✔ Read-only simulation verified on testnet
+### 🪙 Custom Token (SAC)
+- ✔ Custom SPAY token deployed on testnet
+- ✔ Token Contract ID: `CDSFTA5O2CZCLZ6YSKWSPSJZSDONLTTMUYJHN2NCSPGD2VRKLRO7HXAV`
+- ✔ Escrow deposit tested with SPAY token (500 SPAY locked & released)
+- ✔ Contract works with **any SAC token** (not just native XLM)
+### 🧪 Tests (All Passed ✅)
+- ✔ `test_escrow_flow` — Create → Mark Paid → Release funds
+- ✔ `test_escrow_refund` — Create → Mark Paid → Refund to buyer
+- ✔ Duplicate order rejection — Second deposit with same `ref_id` correctly fails
+- ✔ Custom SPAY token deposit + release on testnet
+- ✔ Inter-contract `get_order` query verified on testnet
+### 🔄 CI/CD
+- ✔ GitHub Actions workflow configured
+- ✔ Auto-runs `cargo test` on every push and pull request
+- ✔ Target: `wasm32-unknown-unknown`
+### 💻 Mobile Responsive 
+<img width="1920" height="1080" alt="photo-collage png" src="https://github.com/user-attachments/assets/560c2d40-5bad-4710-9c4f-a5a771db27d5" />
 
-### 🧭 Belt System Progress
+---
+ 
+## 📸 Demo Screenshots
+ 
+###  Create Order ->  Mark Paid -> Release
+<img width="1981" height="813" alt="Screenshot 2026-04-29 020933" src="https://github.com/user-attachments/assets/f42323f3-dff6-4594-af34-2ddb362c9be7" />
+ 
 
-| Level | Belt | Focus |
-|------|------|------|
-| ⚪️ Level 1 | White Belt | Wallets & transactions |
-| 🟡 Level 2 | Yellow Belt | Multi-wallet, contracts & events |
-| 🟠 Level 3 | Orange Belt | Mini dApp + tests |
-| 🟢 Level 4 | Green Belt | Advanced contracts & production readiness |
-| 🔵 Level 5 | Blue Belt | Real MVP (5+ users) |
-| ⚫️ Level 6 | Black Belt | Scale + Demo Day readiness |
+### Inter-Contract Call (get_order)
+<img width="1514" height="244" alt="image" src="https://github.com/user-attachments/assets/6c5d5a04-c706-4e9c-90e8-9526de9cd29d" />
 
 ---
 
-## 🟠 Current Status: ORANGE BELT (Completed)
+## 🟠 ORANGE BELT (Completed)
 
 ### ✅ Smart Contract (Soroban)
 - Deployed successfully on Stellar Testnet
