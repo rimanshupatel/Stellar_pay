@@ -43,7 +43,7 @@ export default function Footer() {
     return (
         <footer className="relative bg-white border-t border-gray-200">
             {/* Gradient Accent Line */}
-            <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-[#FF9B71] to-transparent opacity-60" />
+            <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-gray-300 to-transparent opacity-60" />
 
             <div className="container mx-auto max-w-7xl px-4 py-16">
                 {/* Main Footer Content */}
@@ -51,7 +51,7 @@ export default function Footer() {
                     {/* Brand Column */}
                     <div className="col-span-2">
                         <Link to="/" className="flex items-center space-x-2.5 mb-4 group">
-                            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-gray-900 to-gray-800 flex items-center justify-center shadow-md group-hover:shadow-lg transition-all duration-300">
+                            <div className="w-10 h-10 rounded-xl bg-gray-900 flex items-center justify-center shadow-md group-hover:shadow-lg transition-all duration-300">
                                 <Wallet className="w-6 h-6 text-white" />
                             </div>
                             <span className="text-xl font-bold text-gray-900">

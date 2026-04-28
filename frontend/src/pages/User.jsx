@@ -293,8 +293,8 @@ export default function User({ walletAddress, onConnect }) {
     if (!walletAddress) {
         return (
             <div className="container mx-auto max-w-4xl px-4 py-24">
-                <Card className="text-center">
-                    <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-gray-900 to-gray-800 flex items-center justify-center mx-auto mb-6 shadow-lg">
+                <Card className="text-center border border-gray-100 shadow-premium">
+                    <div className="w-20 h-20 rounded-2xl bg-gray-900 flex items-center justify-center mx-auto mb-6 shadow-md">
                         <Wallet className="w-10 h-10 text-white" />
                     </div>
                     <CardTitle>Connect Your Wallet</CardTitle>
@@ -328,10 +328,10 @@ export default function User({ walletAddress, onConnect }) {
             <div className="absolute inset-0 z-[-1] gradient-mesh opacity-60 pointer-events-none"></div>
 
             {/* Header Stats */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
                 <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.1 }}>
                     <Card className="glass-card card-hover border-0 overflow-hidden relative group">
-                        <div className="absolute inset-0 bg-gradient-to-br from-blue-50/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                        <div className="absolute inset-0 bg-gradient-to-br from-gray-50/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                         <div className="flex items-center justify-between relative z-10 p-2">
                             <div>
                                 <p className="text-sm text-gray-500 mb-1.5 font-medium tracking-wide uppercase">XLM Balance</p>
@@ -339,8 +339,8 @@ export default function User({ walletAddress, onConnect }) {
                                     {formatCrypto(balance.xlm, 'XLM')}
                                 </p>
                             </div>
-                            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-blue-500/30 transform group-hover:scale-110 transition-transform duration-500">
-                                <Wallet className="w-8 h-8 text-white" />
+                            <div className="w-14 h-14 rounded-2xl bg-gray-900 flex items-center justify-center shadow-md transform group-hover:scale-105 transition-transform duration-500">
+                                <Wallet className="w-7 h-7 text-white" />
                             </div>
                         </div>
                     </Card>
@@ -348,7 +348,7 @@ export default function User({ walletAddress, onConnect }) {
 
                 <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.2 }}>
                     <Card className="glass-card card-hover border-0 overflow-hidden relative group">
-                        <div className="absolute inset-0 bg-gradient-to-br from-emerald-50/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                        <div className="absolute inset-0 bg-gradient-to-br from-gray-50/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                         <div className="flex items-center justify-between relative z-10 p-2">
                             <div>
                                 <p className="text-sm text-gray-500 mb-1.5 font-medium tracking-wide uppercase">USDC Balance</p>
@@ -356,8 +356,8 @@ export default function User({ walletAddress, onConnect }) {
                                     {formatCrypto(balance.usdc, 'USDC')}
                                 </p>
                             </div>
-                            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-emerald-400 to-teal-500 flex items-center justify-center shadow-lg shadow-emerald-500/30 transform group-hover:scale-110 transition-transform duration-500">
-                                <TrendingUp className="w-8 h-8 text-white" />
+                            <div className="w-14 h-14 rounded-2xl bg-gray-800 flex items-center justify-center shadow-md transform group-hover:scale-105 transition-transform duration-500">
+                                <TrendingUp className="w-7 h-7 text-white" />
                             </div>
                         </div>
                     </Card>
@@ -365,7 +365,7 @@ export default function User({ walletAddress, onConnect }) {
 
                 <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.3 }}>
                     <Card className="glass-card card-hover border-0 overflow-hidden relative group">
-                        <div className="absolute inset-0 bg-gradient-to-br from-purple-50/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                        <div className="absolute inset-0 bg-gradient-to-br from-gray-50/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                         <div className="flex items-center justify-between relative z-10 p-2">
                             <div>
                                 <p className="text-sm text-gray-500 mb-1.5 font-medium tracking-wide uppercase">Total Payments</p>
@@ -373,8 +373,8 @@ export default function User({ walletAddress, onConnect }) {
                                     {transactions.length}
                                 </p>
                             </div>
-                            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center shadow-lg shadow-purple-500/30 transform group-hover:scale-110 transition-transform duration-500">
-                                <History className="w-8 h-8 text-white" />
+                            <div className="w-14 h-14 rounded-2xl bg-gray-900 flex items-center justify-center shadow-md transform group-hover:scale-105 transition-transform duration-500">
+                                <History className="w-7 h-7 text-white" />
                             </div>
                         </div>
                     </Card>
@@ -382,21 +382,21 @@ export default function User({ walletAddress, onConnect }) {
             </div>
 
             {/* Tabs */}
-            <div className="flex space-x-1 mb-8 bg-gray-100/80 rounded-full p-1.5 w-fit border border-gray-200/60">
+            <div className="flex space-x-1 mb-8 bg-gray-100/50 backdrop-blur-md rounded-xl sm:rounded-full p-1.5 w-full sm:w-fit overflow-x-auto no-scrollbar border border-gray-200/50 snap-x">
                 <button
                     onClick={() => setActiveTab('pay')}
-                    className={`px-6 py-2.5 rounded-full text-sm font-medium transition-all duration-200 ${activeTab === 'pay'
+                    className={`whitespace-nowrap px-6 py-2.5 rounded-lg sm:rounded-full text-sm font-medium transition-all duration-300 snap-center ${activeTab === 'pay'
                         ? 'bg-white text-gray-900 shadow-sm'
-                        : 'text-gray-600 hover:text-gray-900'
+                        : 'text-gray-500 hover:text-gray-900 hover:bg-gray-50'
                         }`}
                 >
                     Pay
                 </button>
                 <button
                     onClick={() => setActiveTab('history')}
-                    className={`px-6 py-2.5 rounded-full text-sm font-medium transition-all duration-200 ${activeTab === 'history'
+                    className={`whitespace-nowrap px-6 py-2.5 rounded-lg sm:rounded-full text-sm font-medium transition-all duration-300 snap-center ${activeTab === 'history'
                         ? 'bg-white text-gray-900 shadow-sm'
-                        : 'text-gray-600 hover:text-gray-900'
+                        : 'text-gray-500 hover:text-gray-900 hover:bg-gray-50'
                         }`}
                 >
                     Transaction History
@@ -520,12 +520,12 @@ export default function User({ walletAddress, onConnect }) {
                                         </div>
                                     )}
 
-                                    <div className="flex space-x-4">
+                                    <div className="flex flex-col sm:flex-row gap-4">
                                         <Button
                                             onClick={handlePay}
                                             disabled={isBusy}
                                             size="lg"
-                                            className="flex-1 flex items-center justify-center space-x-2"
+                                            className="flex-1 flex items-center justify-center space-x-2 w-full"
                                         >
                                             {isBusy ? (
                                                 <>
@@ -545,6 +545,7 @@ export default function User({ walletAddress, onConnect }) {
                                                 disabled={status === "Adding USDC trustline..."}
                                                 variant="outline"
                                                 size="lg"
+                                                className="w-full sm:w-auto"
                                             >
                                                 Add USDC Trustline
                                             </Button>
@@ -581,18 +582,18 @@ export default function User({ walletAddress, onConnect }) {
                                         {transactions.map((tx) => (
                                             <div
                                                 key={tx._id || tx.refId}
-                                                className="p-4 bg-gray-50 rounded-xl border border-gray-200 flex items-center justify-between hover:bg-gray-100/50 transition-colors"
+                                                className="p-4 bg-white rounded-xl border border-gray-100 shadow-sm flex items-center justify-between hover:border-gray-200 hover:shadow-md transition-all duration-300"
                                             >
-                                                <div className="flex-1">
-                                                    <div className="flex items-center space-x-3 mb-2">
+                                                <div className="flex-1 min-w-0">
+                                                    <div className="flex flex-wrap items-center gap-2 mb-2">
                                                         <Badge variant={tx.status === 'success' ? 'success' : tx.status === 'failed' ? 'error' : 'warning'}>
                                                             {tx.status}
                                                         </Badge>
-                                                        <span className="text-sm text-gray-600">
+                                                        <span className="text-xs sm:text-sm text-gray-600 truncate">
                                                             {formatDate(tx.timestamp || tx.createdAt)}
                                                         </span>
                                                     </div>
-                                                    <p className="font-semibold text-gray-900 text-lg">
+                                                    <p className="font-semibold text-gray-900 text-base sm:text-lg">
                                                         {formatCrypto(tx.cryptoAmount, tx.currency)}
                                                     </p>
                                                     <p className="text-sm text-gray-600">

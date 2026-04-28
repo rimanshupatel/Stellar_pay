@@ -1,5 +1,5 @@
+const cors = require("cors");
 const express = require('express');
-const cors = require('cors');
 const { MongoClient } = require('mongodb');
 const dotenv = require('dotenv');
 const jwt = require('jsonwebtoken');
@@ -9,10 +9,13 @@ dotenv.config();
 const app = express();
 app.use(cors());
 app.use(express.json());
-
+app.use(cors({
+  origin: "*",
+  credentials: true
+}));
 // MongoDB connection
 let db;
-const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/stellarPay';
+const MONGODB_URI = process.env.MONGODB_URI
 
 async function connectDB() {
   try {
@@ -177,9 +180,9 @@ app.post('/api/transactions', async (req, res) => {
       const { Horizon } = require('@stellar/stellar-sdk');
       const server = new Horizon.Server('https://horizon-testnet.stellar.org');
       const tx = await server.transactions().transaction(txHash).call();
-      
+
       if (!tx.successful) {
-         return res.status(400).json({ error: 'Transaction failed on network' });
+        return res.status(400).json({ error: 'Transaction failed on network' });
       }
     } catch (e) {
       console.error('Transaction verification failed:', e);
@@ -301,7 +304,6 @@ app.get('/api/merchant/:merchantId/stats', async (req, res) => {
   }
 });
 
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+app.listen(3000, '0.0.0.0', () => {
+  console.log("Server running on port 3000");
 });

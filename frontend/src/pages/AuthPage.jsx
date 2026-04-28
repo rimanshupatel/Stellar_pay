@@ -41,7 +41,7 @@ export default function AuthPage() {
     };
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-[#F5F2ED] relative overflow-hidden px-4 py-12">
+        <div className="min-h-screen flex items-center justify-center bg-[#F9FAFB] relative overflow-hidden px-4 py-12 md:py-24">
             {/* Decorative Background Elements */}
             <div className="absolute inset-0 overflow-hidden pointer-events-none">
                 {/* Dots Pattern - Top Left */}
@@ -84,7 +84,7 @@ export default function AuthPage() {
                         rotate: [0, -5, 0],
                     }}
                     transition={{ duration: 7, repeat: Infinity, ease: "easeInOut" }}
-                    className="absolute bottom-1/4 right-10 w-32 h-32 border-4 border-[#FF9B71] rounded-2xl opacity-40"
+                    className="absolute bottom-1/4 right-10 w-32 h-32 border-4 border-gray-300 rounded-2xl opacity-40"
                 />
             </div>
 
@@ -107,7 +107,7 @@ export default function AuthPage() {
                                 initial={{ scale: 0 }}
                                 animate={{ scale: 1 }}
                                 transition={{ type: "spring", stiffness: 200, delay: 0.3 }}
-                                className="w-20 h-20 bg-gradient-to-br from-[#FF9B71] to-[#FF7E5F] rounded-3xl flex items-center justify-center shadow-xl"
+                                className="w-20 h-20 bg-gray-900 rounded-3xl flex items-center justify-center shadow-xl"
                             >
                                 <Wallet className="w-10 h-10 text-white" />
                             </motion.div>
@@ -150,7 +150,7 @@ export default function AuthPage() {
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ duration: 0.6, delay: 0.2 }}
                     >
-                        <div className="bg-white rounded-3xl shadow-2xl border border-gray-200/60 overflow-hidden soft-shadow-xl">
+                        <div className="bg-white/80 backdrop-blur-xl rounded-3xl border border-gray-200/50 overflow-hidden shadow-premium">
                             {/* Header */}
                             <div className="p-8 pb-6 text-center bg-gradient-to-b from-gray-50 to-white border-b border-gray-100">
                                 <h2 className="text-3xl font-bold text-gray-900 tracking-tight mb-2">
@@ -194,7 +194,7 @@ export default function AuthPage() {
                                                         placeholder="Full Name"
                                                         onChange={handleChange}
                                                         required={!isLogin}
-                                                        className="w-full pl-11 pr-4 py-3.5 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 placeholder-gray-400 focus:bg-white focus:border-[#FF9B71] focus:ring-4 focus:ring-[#FF9B71]/10 outline-none transition-all duration-200"
+                                                        className="w-full pl-11 pr-4 py-3.5 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 placeholder-gray-400 focus:bg-white focus:border-gray-900 focus:ring-4 focus:ring-gray-900/10 outline-none transition-all duration-200"
                                                     />
                                                 </div>
                                             </motion.div>
@@ -211,7 +211,7 @@ export default function AuthPage() {
                                             placeholder="Email Address"
                                             onChange={handleChange}
                                             required
-                                            className="w-full pl-11 pr-4 py-3.5 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 placeholder-gray-400 focus:bg-white focus:border-[#FF9B71] focus:ring-4 focus:ring-[#FF9B71]/10 outline-none transition-all duration-200"
+                                            className="w-full pl-11 pr-4 py-3.5 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 placeholder-gray-400 focus:bg-white focus:border-gray-900 focus:ring-4 focus:ring-gray-900/10 outline-none transition-all duration-200"
                                         />
                                     </div>
 
@@ -225,13 +225,13 @@ export default function AuthPage() {
                                             placeholder="Password"
                                             onChange={handleChange}
                                             required
-                                            className="w-full pl-11 pr-4 py-3.5 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 placeholder-gray-400 focus:bg-white focus:border-[#FF9B71] focus:ring-4 focus:ring-[#FF9B71]/10 outline-none transition-all duration-200"
+                                            className="w-full pl-11 pr-4 py-3.5 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 placeholder-gray-400 focus:bg-white focus:border-gray-900 focus:ring-4 focus:ring-gray-900/10 outline-none transition-all duration-200"
                                         />
                                     </div>
 
                                     {isLogin && (
                                         <div className="flex justify-end">
-                                            <button type="button" className="text-sm text-[#FF9B71] hover:text-[#FF7E5F] font-medium transition-colors">
+                                            <button type="button" className="text-sm text-gray-600 hover:text-gray-900 font-medium transition-colors">
                                                 Forgot Password?
                                             </button>
                                         </div>
@@ -278,7 +278,7 @@ export default function AuthPage() {
                                         type="submit"
                                         disabled={loading}
                                         size="lg"
-                                        className="w-full group bg-gradient-to-r from-[#FF9B71] to-[#FF7E5F] hover:from-[#FF8A5C] hover:to-[#FF6D4A] text-white shadow-lg hover:shadow-xl"
+                                        className="w-full group bg-gray-900 hover:bg-gray-800 text-white shadow-premium hover:shadow-premium-hover transition-all duration-300"
                                     >
                                         {loading ? (
                                             <>
@@ -287,8 +287,10 @@ export default function AuthPage() {
                                             </>
                                         ) : (
                                             <>
-                                                {isLogin ? "Sign In" : "Create Account"}
-                                                <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                                                <div className="flex justify-center items-center gap-2">
+                                                    {isLogin ? "Sign In" : "Create Account"}
+                                                    <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                                                </div>
                                             </>
                                         )}
                                     </Button>
@@ -337,7 +339,7 @@ export default function AuthPage() {
                                         className="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors group"
                                     >
                                         {isLogin ? "New to StellarPay? " : "Already have an account? "}
-                                        <span className="text-[#FF9B71] group-hover:underline underline-offset-4">
+                                        <span className="text-gray-900 font-semibold group-hover:underline underline-offset-4">
                                             {isLogin ? "Create an account" : "Sign in instead"}
                                         </span>
                                     </button>

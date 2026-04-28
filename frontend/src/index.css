@@ -43,7 +43,7 @@
 
 @layer base {
   * {
-    @apply border-border;
+    border-color: hsl(var(--border));
   }
 
   body {
@@ -72,11 +72,21 @@
 
 @layer utilities {
   .glass {
-    @apply bg-white/60 backdrop-blur-2xl border border-white/50 shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] transition-all duration-300;
+    @apply bg-white/60 backdrop-blur-2xl border border-white/50 transition-all duration-300;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.04);
+  }
+
+  .glass:hover {
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
   }
 
   .glass-card {
-    @apply bg-white/70 backdrop-blur-3xl border border-white/60 rounded-3xl shadow-[0_8px_32px_rgba(31,38,135,0.05)] transition-all duration-500 hover:shadow-[0_8px_32px_rgba(31,38,135,0.08)] hover:-translate-y-1;
+    @apply bg-white/70 backdrop-blur-3xl border border-white/60 rounded-3xl transition-all duration-500 hover:-translate-y-1;
+    box-shadow: 0 8px 32px rgba(31, 38, 135, 0.05);
+  }
+
+  .glass-card:hover {
+    box-shadow: 0 8px 32px rgba(31, 38, 135, 0.08);
   }
 
   .soft-shadow {
@@ -105,7 +115,7 @@
 
   .gradient-mesh {
     background-color: #ffffff;
-    background-image: 
+    background-image:
       radial-gradient(at 40% 20%, rgba(255, 140, 102, 0.1) 0px, transparent 50%),
       radial-gradient(at 80% 0%, rgba(181, 238, 21, 0.1) 0px, transparent 50%),
       radial-gradient(at 0% 50%, rgba(59, 130, 246, 0.08) 0px, transparent 50%),
@@ -132,10 +142,14 @@
     border: 1px solid transparent;
     border-radius: inherit;
   }
+
   .border-gradient::before {
     content: '';
     position: absolute;
-    top: 0; right: 0; bottom: 0; left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
     z-index: -1;
     margin: -1px;
     border-radius: inherit;
