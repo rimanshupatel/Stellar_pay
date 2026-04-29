@@ -32,7 +32,31 @@ A **production-grade fintech mini-dApp** built on the **Stellar blockchain + Sor
 ---
  
 ## 🟢 Current Status: GREEN BELT (Completed)
- 
+
+ ## 📋 Contract Addresses (Testnet)
+
+| Name | Address |
+|------|---------|
+| 🔐 Main Escrow Contract (v2) | `CBKMPCT4RSI2NHJJILN7K5K6FB2ZVD7EYCB5G37UT47GJLCPZOZXYMNT` |
+| 💎 Native XLM Token (SAC) | `CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC` |
+| 🪙 Custom SPAY Token | `CDSFTA5O2CZCLZ6YSKWSPSJZSDONLTTMUYJHN2NCSPGD2VRKLRO7HXAV` |
+
+---
+
+## 🔗 Transaction Hashes (Testnet)
+
+| Action | TX Hash |
+|--------|---------|
+| Contract Deploy | `0de3879447f0d02f49c818ea396a0b0cb1ecc8208455bc8c23984c768ed8a085` |
+| Deposit (XLM) | `58cc9c6a1b4af9b88b08d3f70f1420dfd56f358f6aaef9a9f65a32cab7ef320a` |
+| Inter-Contract Call | `c2dad77cf4727ec88276460bbb4e41c89ec40f8cfafabb0e5ff7a38b72519032` |
+
+---
+
+## 🌐 Verify on Stellar Explorer
+
+- 🔍 [Main Escrow Contract](https://stellar.expert/explorer/testnet/contract/CBKMPCT4RSI2NHJJILN7K5K6FB2ZVD7EYCB5G37UT47GJLCPZOZXYMNT)
+- 🔍 [Custom SPAY Token](https://stellar.expert/explorer/testnet/contract/CDSFTA5O2CZCLZ6YSKWSPSJZSDONLTTMUYJHN2NCSPGD2VRKLRO7HXAV)
 ---
  
 ## ✅ Green Belt Checklist
@@ -100,6 +124,12 @@ A **production-grade fintech mini-dApp** built on the **Stellar blockchain + Sor
 - ✔ Contract interaction validation  
 
 ---
+## 📋 Deployed Contract (Testnet)
+
+| Contract | Address |
+|----------|---------|
+| StellarPay Escrow (deposit/release/refund) | `CCC7UZLTM5W4E6ECZ7ZQYUENPHZNK75OK2YTPYL5MGPV5CFAORHSZUN3` |
+| Native XLM (SAC) | `CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC` |
 
 ## 🎥 Demo
 
