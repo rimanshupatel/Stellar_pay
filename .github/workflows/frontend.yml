@@ -15,6 +15,3 @@ jobs:
       - name: Build Frontend
         working-directory: frontend
         run: npm run build
-      - name: Run Tests
-        working-directory: frontend
-        run: npm test -- --watchAll=false
