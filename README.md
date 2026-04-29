@@ -131,6 +131,10 @@ A **production-grade fintech mini-dApp** built on the **Stellar blockchain + Sor
 | StellarPay Escrow (deposit/release/refund) | `CCC7UZLTM5W4E6ECZ7ZQYUENPHZNK75OK2YTPYL5MGPV5CFAORHSZUN3` |
 | Native XLM (SAC) | `CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC` |
 
+## 🌐 Verify on Stellar Explorer
+
+- **✔ Deployed Contract ID: `CCC7UZLTM5W4E6ECZ7ZQYUENPHZNK75OK2YTPYL5MGPV5CFAORHSZUN3`**
+- **🔍 Explorer:** https://stellar.expert/explorer/testnet/contract/CCC7UZLTM5W4E6ECZ7ZQYUENPHZNK75OK2YTPYL5MGPV5CFAORHSZUN3
 ## 🎥 Demo
 
 📽️ Demo Video: *(level 3 Belt)*  
