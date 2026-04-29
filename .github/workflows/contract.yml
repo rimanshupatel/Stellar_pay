@@ -1,0 +1,17 @@
+name: Smart Contract CI
+on: [push, pull_request]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: wasm32-unknown-unknown
+      - name: Run Contract Tests
+        working-directory: contracts
+        run: cargo test
+      - name: Build Contract
+        working-directory: contracts
+        run: cargo build --target wasm32-unknown-unknown --release
